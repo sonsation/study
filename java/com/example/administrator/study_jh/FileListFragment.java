@@ -38,7 +38,7 @@ public class FileListFragment extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_filelist);
+            setContentView(R.layout.fragment_filelist);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
@@ -187,9 +187,8 @@ public class FileListFragment extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        //super.onBackPressed();
 
-        if(isLongClick = true) {
+        if(isLongClick == true) {
             isLongClick = false;
             getDir(currentPath);
         }
