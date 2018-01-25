@@ -3,11 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <item android:id="@+id/hide_option"
-        android:title="숨겨진 파일 표시"
-        app:showAsAction="never"
-        android:checkable="true" />
-
+    <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/file_share"
         android:title="공유"
@@ -17,6 +13,7 @@
         android:id="@+id/file_remove"
         android:title="삭제" />
 
+    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/file_move"
         android:title="이동"
         app:showAsAction="never" />

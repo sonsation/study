@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,9 +22,9 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class FileListFragment extends AppCompatActivity {
+import static android.R.attr.data;
 
-    Parcelable state;
+public class FileListFragment extends AppCompatActivity {
 
     private boolean hideOption = true;
     private boolean isLongClick = false;
@@ -38,7 +40,7 @@ public class FileListFragment extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-            setContentView(R.layout.fragment_filelist);
+        setContentView(R.layout.fragment_filelist);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(mToolbar);
@@ -50,11 +52,8 @@ public class FileListFragment extends AppCompatActivity {
 
         if(savedInstanceState != null){
             currentPath = savedInstanceState.getString("path");
-            ListView.onRestoreInstanceState(state);
-            Toast.makeText(getApplicationContext(), "welcome back", Toast.LENGTH_SHORT).show();
         } else {
             currentPath = rootPath;
-            Toast.makeText(getApplicationContext(), "welcome", Toast.LENGTH_SHORT).show();
         }
 
         getDir(currentPath);
@@ -98,10 +97,10 @@ public class FileListFragment extends AppCompatActivity {
                 ListView.setSelection(position);
                 ListView.setItemChecked(position, true);
 
-
                 return true;
             }
         });
+
 
     }
 
@@ -110,19 +109,49 @@ public class FileListFragment extends AppCompatActivity {
         //return super.onCreateOptionsMenu(menu);
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.filelist_menu_header, menu);
-        return true;
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(isLongClick == false) {
+
+            menu.getItem(0).setVisible(true);
+
+            for(int i = 1 ; i < 8 ; i++) {
+                menu.getItem(i).setVisible(false);
+            }
+
+        } else {
+
+            menu.getItem(0).setVisible(false);
+
+            for(int i = 1 ; i < 8 ; i++) {
+                menu.getItem(i).setVisible(true);
+            }
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         //return super.onOptionsItemSelected(item);
-        CheckBox cb = (CheckBox)findViewById(R.id.hide_option);
+
 
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
+                if(isLongClick == true) {
+                    isLongClick = false;
+                    getDir(currentPath);
+                }
+                else {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
+                }
                 return true;
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
@@ -131,17 +160,18 @@ public class FileListFragment extends AppCompatActivity {
 
             case R.id.hide_option:
 
-                if((cb.isChecked())){
-                    cb.setChecked(false);
+                CheckBox cb = (CheckBox)findViewById(R.id.hide_option);
+
+                if((cb.isChecked())==false){
+                    cb.setChecked(true);
                     //hideOption = false;
                 }
                 else {
-                    cb.setChecked(true);
+                    cb.setChecked(false);
                     //hideOption = true;
                 }
                 //getDir(currentPath);
 
-                return false;
             default:
 
         }
@@ -201,13 +231,7 @@ public class FileListFragment extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        // Save UI state changes to the savedInstanceState.
-        // This bundle will be passed to onCreate if the process is
-        // killed and restarted.
         outState.putString("path", currentPath);
-        state = ListView.onSaveInstanceState();
-
-        // etc.
 
         super.onSaveInstanceState(outState);
     }
