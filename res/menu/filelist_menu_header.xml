@@ -3,19 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
+    <item
+        android:id="@+id/file_search"
+        android:title="검색"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/hide_option"
         android:title="숨겨진 파일 표시"
         app:showAsAction="never"
         android:checkable="true" />
 
     <item
+        android:id="@+id/file_newfolder"
+        android:title="새 폴더 추가"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/file_sorting"
+        android:title="정렬"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/file_settings"
+        android:title="설정"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/file_share"
         android:title="공유"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/file_remove"
-        android:title="삭제" />
+        android:title="삭제"
+        app:showAsAction="never"/>
 
     <item android:id="@+id/file_move"
         android:title="이동"

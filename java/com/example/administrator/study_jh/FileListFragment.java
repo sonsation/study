@@ -1,28 +1,40 @@
 package com.example.administrator.study_jh;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import static android.R.attr.data;
+import org.w3c.dom.Text;
 
 public class FileListFragment extends AppCompatActivity {
 
@@ -35,6 +47,7 @@ public class FileListFragment extends AppCompatActivity {
     private String prevPath = "";
     private String currentPath = "";
     private ListView ListView;
+    private String fName="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,17 +131,23 @@ public class FileListFragment extends AppCompatActivity {
 
         if(isLongClick == false) {
 
-            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(true);
+            menu.getItem(3).setVisible(true);
+            menu.getItem(4).setVisible(true);
 
-            for(int i = 1 ; i < 8 ; i++) {
+            for(int i = 5 ; i < 12 ; i++) {
                 menu.getItem(i).setVisible(false);
             }
 
         } else {
 
-            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(false);
+            menu.getItem(3).setVisible(false);
+            menu.getItem(4).setVisible(false);
 
-            for(int i = 1 ; i < 8 ; i++) {
+            for(int i = 5 ; i < 12 ; i++) {
                 menu.getItem(i).setVisible(true);
             }
         }
@@ -172,6 +191,8 @@ public class FileListFragment extends AppCompatActivity {
                 }
                 //getDir(currentPath);
 
+            case R.id.file_newfolder:
+                createFolder();
             default:
 
         }
@@ -234,5 +255,65 @@ public class FileListFragment extends AppCompatActivity {
         outState.putString("path", currentPath);
 
         super.onSaveInstanceState(outState);
+    }
+
+    public void createFolder(){
+
+        Context mContext = getApplicationContext();
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.cdialog,(ViewGroup) findViewById(R.id.layout_root));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        final EditText cName = (EditText)layout.findViewById(R.id.cText);
+        final TextView confirm = (TextView)layout.findViewById(R.id.cText_confirm);
+
+        builder.setView(layout);
+        builder.setMessage("새 폴더 생성");
+        builder.setPositiveButton("확인",
+                new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                    }
+                });
+        builder.setNegativeButton("취소",
+                new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                fName = cName.getText().toString();
+                File file = new File(currentPath+"/"+fName);
+
+                if(fName.isEmpty()){
+                    confirm.setText("이름을 입력해주세요.");
+                    confirm.setTextColor(Color.parseColor("#FE0000"));
+                }
+                else {
+                    if(file.exists()){
+                        confirm.setText("사용 중인 이름입니다.");
+                        confirm.setTextColor(Color.parseColor("#FE0000"));
+                    }
+                    else {
+                        file.mkdirs();
+                        dialog.dismiss();
+                    }
+                    getDir(currentPath);
+                }
+            }
+        });
     }
 }
