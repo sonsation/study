@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,13 +13,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcelable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,8 +29,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 public class FileListFragment extends AppCompatActivity {
 
@@ -336,7 +329,6 @@ public class FileListFragment extends AppCompatActivity {
                 File file = new File(currentPath+File.separator+test);
 
                 if(file.exists()) {
-                    Toast.makeText(getApplicationContext(), currentPath+File.separator+test, Toast.LENGTH_SHORT).show();
                     file.delete();
                 }
             }
