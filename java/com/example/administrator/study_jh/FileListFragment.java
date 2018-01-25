@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -78,7 +79,7 @@ public class FileListFragment extends AppCompatActivity {
                     if (isLongClick == false) {
 
                         String path = dirName.get(position).toString();
-                        nextPath = currentPath + "/" + path;
+                        nextPath = currentPath +  File.separator + path;
 
                         int lastPostion = currentPath.lastIndexOf("/");
                         prevPath = currentPath.substring(0, lastPostion);
@@ -193,6 +194,10 @@ public class FileListFragment extends AppCompatActivity {
 
             case R.id.file_newfolder:
                 createFolder();
+
+            case R.id.file_remove:
+                remove();
+
             default:
 
         }
@@ -296,7 +301,7 @@ public class FileListFragment extends AppCompatActivity {
             public void onClick(View v)
             {
                 fName = cName.getText().toString();
-                File file = new File(currentPath+"/"+fName);
+                File file = new File(currentPath+ File.separator+fName);
 
                 if(fName.isEmpty()){
                     confirm.setText("이름을 입력해주세요.");
@@ -315,5 +320,27 @@ public class FileListFragment extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void remove() {
+
+        //File file = new File(currentPath);
+        String test = "";
+
+        int count = ListView.getCount();
+
+        for(int i = 0 ; i < count ; i++) {
+            if(ListView.isItemChecked(i)){
+                test = dirName.get(i).toString();
+
+                File file = new File(currentPath+File.separator+test);
+
+                if(file.exists()) {
+                    Toast.makeText(getApplicationContext(), currentPath+File.separator+test, Toast.LENGTH_SHORT).show();
+                    file.delete();
+                }
+            }
+        }
+        getDir(currentPath);
     }
 }
