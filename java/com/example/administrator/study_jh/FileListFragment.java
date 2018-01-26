@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,8 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.Checkable;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,14 +33,15 @@ public class FileListFragment extends AppCompatActivity {
 
     private boolean hideOption = true;
     private boolean isLongClick = false;
-    private ArrayList<String> dirName;
-    private ArrayAdapter<String> listAdapter;
+    private ArrayList<ListviewItem> dirName;
     private String rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
     private String nextPath = "";
     private String prevPath = "";
     private String currentPath = "";
     private ListView ListView;
     private String fName="";
+    private ListviewAdapter adapter;
+    Menu mMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class FileListFragment extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
-        getSupportActionBar().setTitle("File Manager");
+        getSupportActionBar().setTitle("");
 
         ListView = (ListView)(findViewById(R.id.filelistview));
 
@@ -71,8 +71,10 @@ public class FileListFragment extends AppCompatActivity {
 
                     if (isLongClick == false) {
 
-                        String path = dirName.get(position).toString();
-                        nextPath = currentPath +  File.separator + path;
+                        getSupportActionBar().setTitle(currentPath.toString());
+
+                        String path = dirName.get(position).getName().toString();
+                        nextPath = currentPath + File.separator + path;
 
                         int lastPostion = currentPath.lastIndexOf("/");
                         prevPath = currentPath.substring(0, lastPostion);
@@ -96,11 +98,18 @@ public class FileListFragment extends AppCompatActivity {
         ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                int count;
+                count = adapter.getCount();
+
+                for (int i=0; i<count; i++) {
+                    ListView.setItemChecked(i, true);
+                }
 
                 isLongClick = true;
                 ListView.requestFocusFromTouch();
                 getDir(currentPath);
-                listAdapter.notifyDataSetChanged();
+                Toast.makeText(getApplicationContext(), "최상위 폴더 입니다" + count, Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
                 ListView.setSelection(position);
                 ListView.setItemChecked(position, true);
 
@@ -114,6 +123,7 @@ public class FileListFragment extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //return super.onCreateOptionsMenu(menu);
+        mMenu = menu;
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.filelist_menu_header, menu);
 
@@ -171,23 +181,30 @@ public class FileListFragment extends AppCompatActivity {
 
             case R.id.hide_option:
 
-                CheckBox cb = (CheckBox)findViewById(R.id.hide_option);
+                MenuItem hide_option = mMenu.findItem(R.id.hide_option);
 
-                if((cb.isChecked())==false){
-                    cb.setChecked(true);
-                    //hideOption = false;
+                if(hide_option.isChecked()==false) {
+                    hide_option.setChecked(true);
+                    hideOption = false;
                 }
                 else {
-                    cb.setChecked(false);
-                    //hideOption = true;
+                    hide_option.setChecked(false);
+                    hideOption = true;
                 }
-                //getDir(currentPath);
+
+                getDir(currentPath);
+
+                return true;
 
             case R.id.file_newfolder:
                 createFolder();
 
+                return true;
+
             case R.id.file_remove:
                 remove();
+
+                return true;
 
             default:
 
@@ -195,41 +212,41 @@ public class FileListFragment extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     private void getDir(String dirPath) {
 
         dirName = new ArrayList<>();
 
         if(isLongClick == false) {
-            listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dirName);
-        }
-        else {
-            listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, dirName);
+            adapter = new ListviewAdapter(this, R.layout.listview_item, dirName);
+        } else {
+            adapter = new ListviewAdapter(this, R.layout.listview_multi_item, dirName);
         }
 
         File files = new File(dirPath);
         File[] fileList = files.listFiles();
 
         dirName.clear();
-        dirName.add("..");
-
-        for(int i=0 ; i < fileList.length ; i++) {
-
-            if(hideOption == true) {
-                if (!fileList[i].getName().startsWith(".")) {
-                    dirName.add(fileList[i].getName());
-                }
-            }
-            else {
-                dirName.add(fileList[i].getName());
-            }
-        }
+        dirName.add(new ListviewItem(0, ".."));
 
         if(isLongClick == true) {
             dirName.remove(0);
         }
 
-        ListView.setAdapter(listAdapter);
+        for(int i=0 ; i < fileList.length ; i++) {
+
+            if(hideOption == true) {
+                if (!fileList[i].getName().startsWith(".")) {
+                    dirName.add(new ListviewItem(R.drawable.folder,fileList[i].getName()));
+                }
+            }
+            else {
+                dirName.add(new ListviewItem(R.drawable.folder,fileList[i].getName()));
+            }
+        }
+
+        ListView.setAdapter(adapter);
+
+
     }
 
     @Override
@@ -315,17 +332,21 @@ public class FileListFragment extends AppCompatActivity {
 
     public void remove() {
 
+
         int count = ListView.getCount();
 
         for(int i = 0 ; i < count ; i++) {
             if(ListView.isItemChecked(i)){
-                String test = dirName.get(i).toString();
+                String test = dirName.get(i).getName().toString();
 
                 File file = new File(currentPath+File.separator+test);
 
                 if(file.exists()) {
                     file.delete();
                 }
+            }
+            else {
+               Toast.makeText(getApplicationContext(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
             }
         }
         getDir(currentPath);

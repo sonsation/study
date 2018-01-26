@@ -19,8 +19,6 @@
         android:id="@+id/filelistview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="multipleChoice"
-        android:clickable="false"
-        android:focusable="false" />
+        android:choiceMode="multipleChoice" />
 
 </LinearLayout>
