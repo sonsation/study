@@ -121,12 +121,13 @@ public class MainActivity extends AppCompatActivity
             selected = fragment;
             title = "Home";
         } else if (id == R.id.nav_gallery) {
-            Intent intent = new Intent(getApplicationContext(), FileListFragment.class);
+            Intent intent = new Intent(getApplicationContext(), FileListHome.class);
             startActivity(intent);
             overridePendingTransition(R.anim.layout_leftin, R.anim.layout_leftout);
         } else if (id == R.id.nav_slideshow) {
-            fragment = null;
-            title = "Not yet";
+            Intent intent = new Intent(getApplicationContext(), FileListHome.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.layout_leftin, R.anim.layout_leftout);
         } else if (id == R.id.nav_manage) {
             fragment = null;
             title = "Not yet";

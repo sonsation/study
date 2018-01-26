@@ -161,9 +161,7 @@ public class FileListFragment extends AppCompatActivity {
                     getDir(currentPath);
                 }
                 else {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
+                    this.finish();
                 }
                 return true;
             case R.id.action_settings:
@@ -317,14 +315,11 @@ public class FileListFragment extends AppCompatActivity {
 
     public void remove() {
 
-        //File file = new File(currentPath);
-        String test = "";
-
         int count = ListView.getCount();
 
         for(int i = 0 ; i < count ; i++) {
             if(ListView.isItemChecked(i)){
-                test = dirName.get(i).toString();
+                String test = dirName.get(i).toString();
 
                 File file = new File(currentPath+File.separator+test);
 
