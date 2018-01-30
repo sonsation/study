@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListviewAdapter extends BaseAdapter {
+public class ClipboardListViewAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
-    private ArrayList<ListviewItem> data;
+    private ArrayList<ClipboardListViewItem> data;
     private int layout;
 
-    public ListviewAdapter(Context context, int layout, ArrayList<ListviewItem> data){
+    public ClipboardListViewAdapter(Context context, int layout, ArrayList<ClipboardListViewItem> data){
         this.inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.data=data;
         this.layout=layout;
@@ -40,10 +40,7 @@ public class ListviewAdapter extends BaseAdapter {
             convertView=inflater.inflate(layout,parent,false);
         }
 
-        ListviewItem listviewitem=data.get(position);
-
-        ImageView icon=(ImageView)convertView.findViewById(R.id.imageView1);
-        icon.setImageResource(listviewitem.getIcon());
+        ClipboardListViewItem listviewitem=data.get(position);
 
         TextView name=(TextView)convertView.findViewById(R.id.textView1);
         name.setText(listviewitem.getName());

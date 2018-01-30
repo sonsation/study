@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".FileListFragment"></activity>
         <activity android:name=".FileListHome"></activity>
+        <activity android:name=".FilecopyPopup" android:theme="@android:style/Theme.Dialog"></activity>
     </application>
 
 </manifest>

@@ -11,11 +11,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018-01-26.
@@ -23,7 +28,8 @@ import java.io.File;
 
 public class FileListHome extends AppCompatActivity {
 
-    private String rootPath = "/sdcard/";
+    private String internal_path = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private String external_path = "";
     private String status = Environment.getExternalStorageState();
     //private String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 
@@ -38,17 +44,20 @@ public class FileListHome extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
         getSupportActionBar().setTitle("File Manager");
 
-        File file = new File(rootPath);
+        File file;
 
         final TextView space_confirm = (TextView)findViewById(R.id.space_confirm);
+        final TextView external_space_confirm = (TextView)findViewById(R.id.external_space_confirm);
         final ProgressBar progress = (ProgressBar)findViewById(R.id.progress);
-        //final TextView space_confirm2 = (TextView)findViewById(R.id.space_confirm2);
-        final ProgressBar progress2 = (ProgressBar)findViewById(R.id.progressBar2);
+        final ProgressBar external_progress = (ProgressBar)findViewById(R.id.external_progress);
         final GridLayout layout = (GridLayout)findViewById(R.id.internal);
+        final GridLayout external_layout = (GridLayout)findViewById(R.id.external);
 
         if(status.equalsIgnoreCase(Environment.MEDIA_MOUNTED)){
 
             layout.setVisibility(View.VISIBLE);
+
+            file = new File(internal_path);
 
             double internal_total = file.getTotalSpace()/1024/1024/1024;
             double internal_used = internal_total - file.getFreeSpace()/1024/1024/1024;
@@ -59,23 +68,77 @@ public class FileListHome extends AppCompatActivity {
 
         }
 
+        if(getExternalSdCardPath().length() > 0) {
 
-        //ViewGroup layout = (ViewGroup) findViewById(R.id.internal);
+            external_path = getExternalSdCardPath();
+            external_layout.setVisibility(View.VISIBLE);
+
+            file = new File(external_path);
+
+            double external_total = file.getTotalSpace() / 1024 / 1024 / 1024;
+            double external_used = external_total - file.getFreeSpace() / 1024 / 1024 / 1024;
+
+            external_space_confirm.setText(external_used + "GB/" + external_total + "GB 사용됨");
+            external_progress.setProgress((int) external_used);
+            external_progress.setMax((int) external_total);
+
+        }
+
         layout.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 Intent intent = new Intent(getApplicationContext(), FileListFragment.class);
+                intent.putExtra("path", internal_path);
                 startActivity(intent);
             }
         });
 
+        external_layout.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(), FileListFragment.class);
+                intent.putExtra("path", external_path);
+                startActivity(intent);
+            }
+        });
+    }
 
-        //Toast.makeText(getApplicationContext(), "FreeSpace/TotalSpace =" + i +"/"+ j  , Toast.LENGTH_LONG).show();
+    public static String getExternalSdCardPath() {
+        String path = null;
 
+        File sdCardFile = null;
+        List<String> sdCardPossiblePath = Arrays.asList("external_sd", "ext_sd", "external", "extSdCard");
 
+        for (String sdPath : sdCardPossiblePath) {
+            File file = new File("/mnt/", sdPath);
+
+            if (file.isDirectory() && file.canWrite()) {
+                path = file.getAbsolutePath();
+
+                String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+                File testWritable = new File(path, "test_" + timeStamp);
+
+                if (testWritable.mkdirs()) {
+                    testWritable.delete();
+                }
+                else {
+                    path = null;
+                }
+            }
+        }
+
+        if (path != null) {
+            sdCardFile = new File(path);
+        }
+        else {
+            sdCardFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        }
+
+        return sdCardFile.getAbsolutePath();
     }
 
     @Override

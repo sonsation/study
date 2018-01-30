@@ -11,12 +11,12 @@ import android.widget.LinearLayout;
  * Created by Administrator on 2018-01-26.
  */
 
-public class CheckLinearLayout extends GridLayout implements Checkable {
+public class CheckGridLayout extends GridLayout implements Checkable {
 
     // 만약 CheckBox가 아닌 View를 추가한다면 아래의 변수 사용 가능.
     // private boolean mIsChecked ;
 
-    public CheckLinearLayout(Context context, AttributeSet attrs) {
+    public CheckGridLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // mIsChecked = false ;
