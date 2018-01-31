@@ -1,0 +1,62 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer"
+    android:layout_gravity="end"
+    android:orientation="vertical"
+    android:layout_marginTop="112sp"
+    android:background="#ECDFDF"
+    android:padding="5dp"
+    android:weightSum="1"
+    android:layout_height="400sp"
+    android:layout_width="240sp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#82966b"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:text="Clip Board" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="279dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/file_clipboard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f2ffe8"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+        android:id="@+id/file_paste"
+        android:layout_height="wrap_content"
+        android:background="#00ff0000"
+        android:textColor="#000000"
+        android:text="PASTE"
+        android:layout_width="100dp" />
+
+        <Button
+            android:id="@+id/clip_clear"
+            android:layout_height="wrap_content"
+            android:background="#00ff0000"
+            android:textColor="#000000"
+            android:text="CLEAR"
+            android:layout_width="100dp" />
+    </LinearLayout>
+
+
+</LinearLayout>

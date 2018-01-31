@@ -19,7 +19,7 @@
         android:id="@+id/internal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:layout_width="274dp"
@@ -62,7 +62,7 @@
         android:id="@+id/external"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:layout_width="274dp"
@@ -98,6 +98,26 @@
             android:layout_column="0"
             android:layout_columnSpan="1"
             android:layout_rowSpan="3"/>
+
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="325dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/folder"
+            android:id="@+id/imageButton"
+            android:layout_row="3"
+            android:layout_column="0" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:id="@+id/Download"
+            android:layout_height="51dp" />
 
     </GridLayout>
 

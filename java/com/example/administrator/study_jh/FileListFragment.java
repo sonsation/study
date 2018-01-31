@@ -35,6 +35,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -53,14 +54,19 @@ public class FileListFragment extends AppCompatActivity {
     private String rootPath = "";
     private String nextPath = "";
     private String prevPath = "";
-    private String currentPath = "";
-    private ListView ListView;
+    public String currentPath = "";
+    private ListView fileListView;
     private String fName="";
     private ListviewAdapter adapter;
-    private ArrayList<ClipboardListViewItem> listitem = new ArrayList<>();;
-    Menu mMenu;
+    public ClipboardListViewAdapter clipAdapter;
+    public ArrayList<ClipboardListViewItem> clipListitem = new ArrayList<>();;
+    public Menu mMenu;
+    private DrawerLayout drawerLayout;
+    private View drawerView;
+    private TextView currentpath_view;
+    private long start, end;
 
-    ListView listview1 = null ;
+    public ListView clipListView = null ;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,33 +78,18 @@ public class FileListFragment extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
-        getSupportActionBar().setTitle("");
+        getSupportActionBar().setTitle("FILE MANAGER");
 
-        listview1 = (ListView) findViewById(R.id.file_clipboard);
+        clipListView = (ListView) findViewById(R.id.file_clipboard);
+        fileListView = (ListView)(findViewById(R.id.filelistview));
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        currentpath_view = (TextView) findViewById(R.id.currentpath_view);
+        drawerView = (View)findViewById(R.id.drawer);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-
-        //NavigationView navigationView1 = (NavigationView) findViewById(R.id.file_view);
-        //navigationView1.setNavigationItemSelectedListener(this);
-
-        Button btn = (Button)findViewById(R.id.button2);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer) ;
-                //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer) ;
-                if (!drawer.isDrawerOpen(Gravity.RIGHT)) {
-                    drawer.openDrawer(Gravity.RIGHT) ;
-                }
-
-            }
-        });
+        currentpath_view.setText(currentPath.toString());
 
         rootPath = getIntent().getStringExtra("path");
-
-        ListView = (ListView)(findViewById(R.id.filelistview));
 
         if(savedInstanceState != null){
             currentPath = savedInstanceState.getString("path");
@@ -108,19 +99,19 @@ public class FileListFragment extends AppCompatActivity {
 
         getDir(currentPath);
 
-            ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     if (isLongClick == false) {
-
-                        getSupportActionBar().setTitle(currentPath.toString());
 
                         String path = dirName.get(position).getName().toString();
                         nextPath = currentPath + File.separator + path;
 
                         int lastPostion = currentPath.lastIndexOf("/");
                         prevPath = currentPath.substring(0, lastPostion);
+
+                        currentpath_view.setText(currentPath.toString());
 
                         if (path.equals("..")) {
 
@@ -138,37 +129,62 @@ public class FileListFragment extends AppCompatActivity {
                 }
             });
 
-        listview1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String path = listitem.get(position).getPath().toString();
-                Toast.makeText(getApplicationContext(), "path = "+path , Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-        ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        fileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                int count;
-                count = adapter.getCount();
-
-                for (int i=0; i<count; i++) {
-                    ListView.setItemChecked(i, true);
-                }
-
                 isLongClick = true;
-                ListView.requestFocusFromTouch();
+                fileListView.requestFocusFromTouch();
                 getDir(currentPath);
                 adapter.notifyDataSetChanged();
-                ListView.setSelection(position);
-                ListView.setItemChecked(position, true);
+                fileListView.setSelection(position);
+                fileListView.setItemChecked(position, true);
 
                 return true;
             }
         });
 
+        Button file_clip = (Button)findViewById(R.id.file_clip);
+        file_clip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(drawerLayout.isDrawerOpen(drawerView)) {
+                    drawerLayout.closeDrawer(drawerView);
+                }
+                else {
+                    drawerLayout.openDrawer(drawerView);
+                }
+            }
+        });
 
+        Button clip_clear = (Button)findViewById(R.id.clip_clear);
+        clip_clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clipListitem.clear();
+                drawerLayout.closeDrawer(drawerView);
+            }
+        });
+
+        Button file_paste = (Button)findViewById(R.id.file_paste);
+        file_paste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startCopyThread();
+                if(end > 0) {
+                    Toast.makeText(getApplicationContext(), "경과시간 = " + (end-start) , Toast.LENGTH_SHORT).show();
+                }
+                drawerLayout.closeDrawer(drawerView);
+            }
+        });
+
+        clipListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String path = clipListitem.get(position).getPath().toString();
+                Toast.makeText(getApplicationContext(), "path = "+path , Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     @Override
@@ -226,10 +242,12 @@ public class FileListFragment extends AppCompatActivity {
                 }
                 return true;
             case R.id.file_settings:
+                /*
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer) ;
                 if (!drawer.isDrawerOpen(Gravity.RIGHT)) {
                     drawer.openDrawer(Gravity.RIGHT) ;
                 }
+                */
                 return true;
 
             case R.id.hide_option:
@@ -261,12 +279,37 @@ public class FileListFragment extends AppCompatActivity {
 
             case R.id.file_copy:
                 copyToClipboard();
-
                 return true;
+
+            case R.id.file_rename:
+                renameFile();
+                return true;
+
             default:
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed(){
+
+        if(isLongClick == true) {
+            isLongClick = false;
+            getDir(currentPath);
+        }
+        else {
+            super.onBackPressed();
+        }
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        outState.putString("path", currentPath);
+
+        super.onSaveInstanceState(outState);
     }
 
     private void getDir(String dirPath) {
@@ -302,31 +345,11 @@ public class FileListFragment extends AppCompatActivity {
             }
         }
 
-        ListView.setAdapter(adapter);
+        fileListView.setAdapter(adapter);
 
 
     }
 
-    @Override
-    public void onBackPressed(){
-
-        if(isLongClick == true) {
-            isLongClick = false;
-            getDir(currentPath);
-        }
-        else {
-            super.onBackPressed();
-        }
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-        outState.putString("path", currentPath);
-
-        super.onSaveInstanceState(outState);
-    }
 
     public void createFolder(){
 
@@ -388,7 +411,7 @@ public class FileListFragment extends AppCompatActivity {
         });
     }
 
-    public void modifynName(){
+    public void renameFile(){
 
         Context mContext = getApplicationContext();
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -450,72 +473,32 @@ public class FileListFragment extends AppCompatActivity {
 
     private void copyToClipboard(){
 
-        int count = ListView.getCount();
-        ClipboardListViewAdapter adapter1 = new ClipboardListViewAdapter(this, R.layout.listview_multi_item, listitem);
+        int count = fileListView.getCount();
+        clipAdapter = new ClipboardListViewAdapter(this, R.layout.listview_multi_item, clipListitem);
 
         for(int i = 0 ; i < count ; i++) {
-            if(ListView.isItemChecked(i)) {
+            if(fileListView.isItemChecked(i)) {
                 String test = currentPath + File.separator + dirName.get(i).getName().toString();
-                listitem.add(new ClipboardListViewItem(test,dirName.get(i).getName().toString(),""));
+                clipListitem.add(new ClipboardListViewItem(test,dirName.get(i).getName().toString(),""));
             }
         }
 
-        adapter1.notifyDataSetChanged();
-        listview1.setAdapter(adapter1);
-
+        clipListView.setAdapter(clipAdapter);
     }
 
 
-    class backThread implements Runnable {
-
-        int count = ListView.getCount();
-        long start;
-        long end;
-        String data[] = new String[count];
-
-        public void run(){
-
-            try {
-
-                start = System.currentTimeMillis();
-
-                for(int i = 0 ; i < count ; i++) {
-                    if(ListView.isItemChecked(i)){
-                        String test = dirName.get(i).getName().toString();
-                        File file = new File(currentPath + File.separator + test);
-                        copyFile(file, currentPath + File.separator + test+"temp");
-                    }
-                }
-
-                end = System.currentTimeMillis();
-                Toast.makeText(getApplicationContext(), "경과시간 = "+ (end-start), Toast.LENGTH_SHORT).show();
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void multiChecked() {
-
-        backThread runnable = new backThread();
-        Thread thread = new Thread(runnable);
-        thread.setDaemon(true);
-        thread.start();
-    }
 
     public void remove() {
 
-        int count = ListView.getCount();
-        int checked = ListView.getCheckedItemCount();
+        int count = fileListView.getCount();
+        int checked = fileListView.getCheckedItemCount();
 
         if(checked == 0) {
             Toast.makeText(getApplicationContext(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
         }
         else {
             for (int i = 0; i < count; i++) {
-                if (ListView.isItemChecked(i)) {
+                if (fileListView.isItemChecked(i)) {
                     String test = dirName.get(i).getName().toString();
 
                     File file = new File(currentPath + File.separator + test);
@@ -529,7 +512,7 @@ public class FileListFragment extends AppCompatActivity {
         getDir(currentPath);
     }
 
-    private boolean copyFile(File file, String target_dir){
+    public boolean copyFile(File file, String target_dir){
         boolean result;
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -561,4 +544,38 @@ public class FileListFragment extends AppCompatActivity {
         }
         return result;
     }
+/*
+    class copyThread implements Runnable {
+
+        int count = clipListView.getCount();
+
+        public void run(){
+            try {
+
+                start = System.currentTimeMillis();
+
+                for (int i = 0; i < count; i++) {
+                    String targetedDir = clipListitem.get(i).getPath().toString();
+                    String targetFile =  clipListitem.get(i).getName().toString();
+                    File file = new File(targetedDir);
+                    //File target = new File(path.currentPath)
+                    copyFile(file, currentPath + File.separator + targetFile);
+                }
+;
+                end = System.currentTimeMillis();
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+    }
+*/
+    private void startCopyThread() {
+        FileThread runnable = new FileThread();
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
 }

@@ -107,6 +107,32 @@ public class FileListHome extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //return super.onCreateOptionsMenu(menu);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.filelist_menu_header, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //return super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
+                return true;
+
+            default:
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public static String getExternalSdCardPath() {
         String path = null;
 
@@ -141,29 +167,5 @@ public class FileListHome extends AppCompatActivity {
         return sdCardFile.getAbsolutePath();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //return super.onCreateOptionsMenu(menu);
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.filelist_menu_header, menu);
 
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //return super.onOptionsItemSelected(item);
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
-                return true;
-
-            default:
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }
