@@ -430,12 +430,27 @@ public class FileListFragment extends AppCompatActivity {
     private void copyToClipboard(){
 
         int count = fileListView.getCount();
+        boolean result = false;
         clipAdapter = new ClipboardListViewAdapter(this, R.layout.listview_multi_item, clipListitem);
 
         for(int i = 0 ; i < count ; i++) {
             if(fileListView.isItemChecked(i)) {
                 String test = currentPath + File.separator + dirName.get(i).getName().toString();
-                clipListitem.add(new ClipboardListViewItem(test,dirName.get(i).getName().toString(),""));
+                int index = clipListView.getCount();
+
+                for(int j = 0 ; j < index ; j++) {
+                    if(clipListitem.get(i).getPath().toString().equals(test)) {
+                        Toast.makeText(getApplicationContext(), "해당 파일이나 폴더가 클립보드에 이미 등록 되었습니다.", Toast.LENGTH_SHORT).show();
+                        result = true;
+                        return;
+                    }
+                }
+
+                if(result = true) {
+                    clipListitem.add(new ClipboardListViewItem(test, dirName.get(i).getName().toString(), ""));
+                }
+
+                result = false;
             }
         }
         clipListView.setAdapter(clipAdapter);
