@@ -68,11 +68,10 @@ public class FileListFragment extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private View drawerView;
     private TextView currentpath_view;
-    final Handler handler = new MyHandler(this);
-
     public ListView clipListView = null ;
-    public boolean result = true;
-    public long start, end;
+    public static final int SEND_INFORMATION = 0;
+    public static final int SEND_STOP = 1;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -258,12 +257,9 @@ public class FileListFragment extends AppCompatActivity {
                 }
                 return true;
             case R.id.file_settings:
-                /*
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer) ;
-                if (!drawer.isDrawerOpen(Gravity.RIGHT)) {
-                    drawer.openDrawer(Gravity.RIGHT) ;
-                }
-                */
+                String test = "123";
+                //Toast.makeText(getApplicationContext(), "추출 값 = "+ (temp+1) , Toast.LENGTH_SHORT).show();
+
                 return true;
 
             case R.id.hide_option:
@@ -285,11 +281,17 @@ public class FileListFragment extends AppCompatActivity {
 
             case R.id.file_newfolder:
                 createFolder();
-
                 return true;
 
             case R.id.file_remove:
-                remove();
+                int count = fileListView.getCount();
+
+                for(int i = 0 ; i < count ; i++) {
+                    if (fileListView.isItemChecked(i)){
+                        String path = currentPath+File.separator+dirName.get(i).getName().toString();
+                        remove(path);
+                    }
+                }
 
                 return true;
 
@@ -302,6 +304,7 @@ public class FileListFragment extends AppCompatActivity {
                 return true;
 
             default:
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -440,25 +443,29 @@ public class FileListFragment extends AppCompatActivity {
 
 
 
-    public void remove() {
+    public void remove(String path) {
 
-        int count = fileListView.getCount();
+        File file = new File(path);
+        File[] tempFile = file.listFiles();
 
-        for (int i = 0; i < count; i++) {
-                if(fileListView.isItemChecked(i)==false){
-                    Toast.makeText(getApplicationContext(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
-                    break;
+        if(tempFile.length >0){
+            for (int i = 0; i < tempFile.length; i++)
+            {
+                if(tempFile[i].isFile()){
+                    tempFile[i].delete();
                 }
-                if (fileListView.isItemChecked(i)) {
-                    String test = dirName.get(i).getName().toString();
-                    File file = new File(currentPath + File.separator + test);
-
-                if (file.exists()) {
-                    file.delete();
+                else{
+                    remove(tempFile[i].getPath());
                 }
+                tempFile[i].delete();
+            }
+            file.delete();
+        }
+        else {
+            if(file.exists()) {
+                file.delete();
             }
         }
-        getDir(currentPath);
     }
 
     public boolean copyFile(File beforeDir, String afterDir){
@@ -497,6 +504,8 @@ public class FileListFragment extends AppCompatActivity {
     class copyThread implements Runnable {
 
         int count = clipListView.getCount();
+        long start, end;
+        boolean result;
 
         public void run(){
             try {
@@ -507,26 +516,47 @@ public class FileListFragment extends AppCompatActivity {
                     for (int i = 0; i < count; i++) {
                         String targetedDir = clipListitem.get(i).getPath().toString();
                         String targetName = clipListitem.get(i).getName().toString();
+                        String tempTarget = null;
                         File file = new File(targetedDir);
 
                         if (targetedDir.equals(currentPath + File.separator + targetName)) {
                             int dotIndex = targetName.lastIndexOf(".");
                             String tempName = targetName.substring(0, dotIndex);
                             String tempExtension = targetName.substring(dotIndex, targetName.length());
-                            targetName = tempName + "_copied" + tempExtension;
+                            tempTarget = tempName + "_copied" + tempExtension;  //original_copied
                         }
-                        copyFile(file, currentPath + File.separator + targetName);
 
-                        handler.sendEmptyMessage(1);
-                        Message message= Message.obtain();
-                        message.what = 2;
-                        handler.sendMessage(message);
+                        File tempFIle = new File(currentPath+File.separator+tempTarget); //original_copied
+                        File tempPath = new File(currentPath+File.separator);
+                        File[] fileList = tempPath.listFiles();
 
+                        while(tempFIle.exists()) {
+                            int dotIndex = tempTarget.lastIndexOf(".");
+                            String tempName = tempTarget.substring(0, dotIndex);
+                            String tempExtension = tempTarget.substring(dotIndex, tempTarget.length());
+                            tempTarget = tempName + "(1)" + tempExtension; //original_copied(1)
+                        }
+
+                        copyFile(file, currentPath + File.separator + tempTarget);
                         result = false;
                     }
                 }
 
                 end = System.currentTimeMillis();
+
+                // 메시지 얻어오기
+                Message message = handler.obtainMessage();
+                // 메시지 ID 설정
+                message.what = SEND_INFORMATION;
+                // 메시지 내용 설정(int)
+                message.arg1 = (int)(end-start);
+                // 메시지 내용 설정 (Object)
+                String information = new String("소요시간");
+                message.obj = information;
+
+                // 메시지 전송
+                handler.sendMessage(message);
+
                 Thread.sleep(1000);
             }
             catch (InterruptedException e){
@@ -541,31 +571,22 @@ public class FileListFragment extends AppCompatActivity {
         thread.start();
     }
 
-    private static class MyHandler extends Handler {
-        private final WeakReference<FileListFragment> mActivity;
-
-        public MyHandler(FileListFragment activity) {
-            mActivity = new WeakReference<FileListFragment>(activity);
-        }
-
+    final Handler handler = new Handler(){
         @Override
-        public void handleMessage(Message msg) {
-            FileListFragment activity = mActivity.get();
-            if (activity != null) {
-                /**
-                 * 넘겨받은 what값을 이용해 실행할 작업을 분류합니다
-                 */
-                if(msg.what==1){
-                    Log.d("What Number : ", "What is 1");
-                }else if(msg.what==2){
-                    Log.d("What Number : ", "What is 2");
-                }
-
-                if(activity.result==false){
-                    Toast.makeText(activity, "경과 시간 = " + (activity.end - activity.start), Toast.LENGTH_SHORT).show();
-                }
+        public void handleMessage(Message msg){
+            switch (msg.what) {
+                case SEND_INFORMATION:
+                    Toast.makeText(getApplicationContext(), Integer.toString(msg.arg1) + msg.obj, Toast.LENGTH_SHORT).show();
+                    getDir(currentPath);
+                    //textView.setText(Integer.toString(msg.arg1) + msg.obj);
+                    break;
+               // case SEND_STOP:
+                //    //thread.stopThread();
+                //    //textView.setText("Thread 가 중지됨.");
+                    //break;
+                default:
+                    break;
             }
         }
-    }
-
+    };
 }
