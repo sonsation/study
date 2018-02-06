@@ -29,8 +29,8 @@ public class FilecopyPopup extends Activity {
 
         //데이터 가져오기
         Intent intent = getIntent();
-        String data = intent.getStringExtra("data");
-        txtText.setText(data);
+        DataShare data = (DataShare)intent.getSerializableExtra("data");
+        txtText.setText(data.name);
     }
 
     //확인 버튼 클릭

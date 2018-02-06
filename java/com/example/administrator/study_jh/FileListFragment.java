@@ -26,13 +26,14 @@ import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +48,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import static java.lang.String.valueOf;
 
@@ -67,32 +70,29 @@ public class FileListFragment extends AppCompatActivity {
     public Menu mMenu;
     private DrawerLayout drawerLayout;
     private View drawerView;
-    private TextView currentpath_view;
     public ListView clipListView = null ;
     public static final int SEND_INFORMATION = 0;
     public static final int SEND_STOP = 1;
-
+    public int checked = 0;
+    ActionBar ab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_filelist);
-
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
-        getSupportActionBar().setTitle("FILE MANAGER");
+        ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowCustomEnabled(false);
+        ab.setDisplayShowTitleEnabled(true);
+        ab.setHomeAsUpIndicator(R.drawable.ic_action_name);
+        ab.setTitle("FILE MANAGER");
 
         clipListView = (ListView) findViewById(R.id.file_clipboard);
         fileListView = (ListView)(findViewById(R.id.filelistview));
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        currentpath_view = (TextView) findViewById(R.id.currentpath_view);
         drawerView = (View)findViewById(R.id.drawer);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-        currentpath_view.setText(currentPath.toString());
 
         rootPath = getIntent().getStringExtra("path");
 
@@ -116,8 +116,6 @@ public class FileListFragment extends AppCompatActivity {
                         int lastPostion = currentPath.lastIndexOf("/");
                         prevPath = currentPath.substring(0, lastPostion);
 
-                        currentpath_view.setText(currentPath.toString());
-
                         if (path.equals("..")) {
 
                             if (prevPath.length() < rootPath.length()) {
@@ -130,6 +128,10 @@ public class FileListFragment extends AppCompatActivity {
                             getDir(nextPath);
                             currentPath = nextPath;
                         }
+                    } else {
+                        TextView getitemcount = (TextView)findViewById(R.id.getitemcount);
+                        checked = getCheckedItemCount(fileListView);
+                        getitemcount.setText(String.valueOf(checked));
                     }
                 }
             });
@@ -137,6 +139,15 @@ public class FileListFragment extends AppCompatActivity {
         fileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                ab.setDisplayShowTitleEnabled(false);
+                ab.setDisplayShowCustomEnabled(true);
+                View mCustomView = LayoutInflater.from(getApplication()).inflate(R.layout.clip_toolbar, null);
+                ab.setCustomView(mCustomView);
+                mMenu.setGroupVisible(R.id.longfalse, false);
+                mMenu.setGroupVisible(R.id.longtrue, true);
+                mMenu.setGroupVisible(R.id.under_two, true);
+
                 isLongClick = true;
                 fileListView.requestFocusFromTouch();
                 getDir(currentPath);
@@ -144,9 +155,14 @@ public class FileListFragment extends AppCompatActivity {
                 fileListView.setSelection(position);
                 fileListView.setItemChecked(position, true);
 
+                TextView getitemcount = (TextView)findViewById(R.id.getitemcount);
+                checked = getCheckedItemCount(fileListView);
+                getitemcount.setText(String.valueOf(checked));
+
                 return true;
             }
         });
+
 
         Button file_clip = (Button)findViewById(R.id.file_clip);
         file_clip.setOnClickListener(new View.OnClickListener() {
@@ -177,8 +193,6 @@ public class FileListFragment extends AppCompatActivity {
             public void onClick(View view) {
 
                 startCopyThread();
-
-
                 //clipListitem.clear();
                 drawerLayout.closeDrawer(drawerView);
             }
@@ -188,16 +202,6 @@ public class FileListFragment extends AppCompatActivity {
         clipListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String path = clipListitem.get(position).getName().toString();
-                //int indexOfNmae = path.lastIndexOf(".");
-                //String name = path.substring(indexOfNmae+1, path.length());
-                //Toast.makeText(getApplicationContext(), "path = "+name , Toast.LENGTH_SHORT).show();
-
-                //if(timer.result == true) {
-                 //   Toast.makeText(getApplicationContext(), "경과시간 = "+ (end-start) , Toast.LENGTH_SHORT).show();
-               // }
-
-
 
             }
         });
@@ -205,38 +209,25 @@ public class FileListFragment extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //return super.onCreateOptionsMenu(menu);
         mMenu = menu;
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.filelist_menu_header, menu);
 
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        if(isLongClick == false) {
+        if((checked > 1) && (isLongClick == true)) {
+            mMenu.setGroupVisible(R.id.over_two, true);
+            mMenu.setGroupVisible(R.id.under_two, false);
 
-            menu.getItem(1).setVisible(true);
-            menu.getItem(2).setVisible(true);
-            menu.getItem(3).setVisible(true);
-            menu.getItem(4).setVisible(true);
+        }
 
-            for(int i = 5 ; i < 12 ; i++) {
-                menu.getItem(i).setVisible(false);
-            }
-
-        } else {
-
-            menu.getItem(1).setVisible(false);
-            menu.getItem(2).setVisible(false);
-            menu.getItem(3).setVisible(false);
-            menu.getItem(4).setVisible(false);
-
-            for(int i = 5 ; i < 12 ; i++) {
-                menu.getItem(i).setVisible(true);
-            }
+        if((checked <= 1) && (isLongClick == true)) {
+            mMenu.setGroupVisible(R.id.over_two, false);
+            mMenu.setGroupVisible(R.id.under_two, true);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -249,18 +240,17 @@ public class FileListFragment extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 if(isLongClick == true) {
-                    isLongClick = false;
-                    getDir(currentPath);
+                    init();
                 }
                 else {
                     this.finish();
                 }
-                return true;
+                break;
             case R.id.file_settings:
-                String test = "123";
-                //Toast.makeText(getApplicationContext(), "추출 값 = "+ (temp+1) , Toast.LENGTH_SHORT).show();
 
-                return true;
+                //Toast.makeText(getApplicationContext(), "경과시간 = "+ temp , Toast.LENGTH_SHORT).show();
+
+                break;
 
             case R.id.hide_option:
 
@@ -274,34 +264,77 @@ public class FileListFragment extends AppCompatActivity {
                     hide_option.setChecked(false);
                     hideOption = true;
                 }
-
                 getDir(currentPath);
 
-                return true;
+                break;
 
             case R.id.file_newfolder:
                 createFolder();
-                return true;
+                break;
 
             case R.id.file_remove:
-                int count = fileListView.getCount();
 
-                for(int i = 0 ; i < count ; i++) {
-                    if (fileListView.isItemChecked(i)){
-                        String path = currentPath+File.separator+dirName.get(i).getName().toString();
-                        remove(path);
-                    }
+                if(getCheckedItemCount(fileListView) == 0){
+                    Toast.makeText(getApplicationContext(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
 
-                return true;
+                else {
+                    new AlertDialog.Builder(this)
+                            .setMessage("항목 " + getCheckedItemCount(fileListView) + "개를 삭제합니다.")
+                            .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    int count = fileListView.getCount();
+
+                                    for (int i = 0; i < count; i++) {
+                                        if (fileListView.isItemChecked(i)) {
+                                            String path = currentPath + File.separator + dirName.get(i).getName().toString();
+                                            remove(path);
+                                        }
+                                    }
+
+                                    isLongClick = false;
+                                    getDir(currentPath);
+                                }
+                            })
+                            .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                }
+                            })
+                            .show();
+                }
+
+                break;
 
             case R.id.file_copy:
                 copyToClipboard();
-                return true;
+                break;
 
             case R.id.file_rename:
-                //renameFile();
-                return true;
+                Intent intent = new Intent(this, FilecopyPopup.class);
+                DataShare  data = new DataShare("test", checked);
+                intent.putExtra("data", data);
+                startActivity(intent);
+                break;
+
+            case R.id.file_allselect:
+                int count = fileListView.getCount();
+
+                if(count == getCheckedItemCount(fileListView)){
+                    for(int i = 0 ; i < count ; i++){
+                        fileListView.setItemChecked(i, false);
+                     }
+                } else {
+                    for(int i = 0 ; i < count ; i++){
+                        fileListView.setItemChecked(i, true);
+                    }
+                }
+
+                TextView getitemcount = (TextView)findViewById(R.id.getitemcount);
+                checked = getCheckedItemCount(fileListView);
+                getitemcount.setText(String.valueOf(checked));
+
+                break;
+
 
             default:
                 break;
@@ -314,8 +347,7 @@ public class FileListFragment extends AppCompatActivity {
     public void onBackPressed(){
 
         if(isLongClick == true) {
-            isLongClick = false;
-            getDir(currentPath);
+            init();
         }
         else {
             super.onBackPressed();
@@ -430,27 +462,25 @@ public class FileListFragment extends AppCompatActivity {
     private void copyToClipboard(){
 
         int count = fileListView.getCount();
-        boolean result = false;
+        int index = clipListView.getCount();
+        boolean result = true;
         clipAdapter = new ClipboardListViewAdapter(this, R.layout.listview_multi_item, clipListitem);
 
         for(int i = 0 ; i < count ; i++) {
             if(fileListView.isItemChecked(i)) {
-                String test = currentPath + File.separator + dirName.get(i).getName().toString();
-                int index = clipListView.getCount();
+                String filePath = currentPath + File.separator + dirName.get(i).getName().toString();
 
                 for(int j = 0 ; j < index ; j++) {
-                    if(clipListitem.get(i).getPath().toString().equals(test)) {
+                    if(clipListitem.get(j).getPath().toString().equals(filePath)) {
                         Toast.makeText(getApplicationContext(), "해당 파일이나 폴더가 클립보드에 이미 등록 되었습니다.", Toast.LENGTH_SHORT).show();
-                        result = true;
-                        return;
+                        result = false;
+                        break;
                     }
                 }
 
-                if(result = true) {
-                    clipListitem.add(new ClipboardListViewItem(test, dirName.get(i).getName().toString(), ""));
+                if(result == true) {
+                    clipListitem.add(new ClipboardListViewItem(filePath, dirName.get(i).getName().toString(), ""));
                 }
-
-                result = false;
             }
         }
         clipListView.setAdapter(clipAdapter);
@@ -463,7 +493,7 @@ public class FileListFragment extends AppCompatActivity {
         File file = new File(path);
         File[] tempFile = file.listFiles();
 
-        if(tempFile.length >0){
+        if(file.isDirectory()){
             for (int i = 0; i < tempFile.length; i++)
             {
                 if(tempFile[i].isFile()){
@@ -476,11 +506,11 @@ public class FileListFragment extends AppCompatActivity {
             }
             file.delete();
         }
-        else {
-            if(file.exists()) {
-                file.delete();
-            }
+
+        if(file.exists()) {
+            file.delete();
         }
+
     }
 
     public boolean copyFile(File beforeDir, String afterDir){
@@ -520,6 +550,7 @@ public class FileListFragment extends AppCompatActivity {
 
         int count = clipListView.getCount();
         long start, end;
+        String tempTarget = null;
         boolean result;
 
         public void run(){
@@ -531,7 +562,6 @@ public class FileListFragment extends AppCompatActivity {
                     for (int i = 0; i < count; i++) {
                         String targetedDir = clipListitem.get(i).getPath().toString();
                         String targetName = clipListitem.get(i).getName().toString();
-                        String tempTarget = null;
                         File file = new File(targetedDir);
 
                         if (targetedDir.equals(currentPath + File.separator + targetName)) {
@@ -541,15 +571,34 @@ public class FileListFragment extends AppCompatActivity {
                             tempTarget = tempName + "_copied" + tempExtension;  //original_copied
                         }
 
-                        File tempFIle = new File(currentPath+File.separator+tempTarget); //original_copied
-                        File tempPath = new File(currentPath+File.separator);
-                        File[] fileList = tempPath.listFiles();
+                        File tempFile = new File(currentPath);
+                        File[] tempFileList = tempFile.listFiles();
 
-                        while(tempFIle.exists()) {
-                            int dotIndex = tempTarget.lastIndexOf(".");
-                            String tempName = tempTarget.substring(0, dotIndex);
-                            String tempExtension = tempTarget.substring(dotIndex, tempTarget.length());
-                            tempTarget = tempName + "(1)" + tempExtension; //original_copied(1)
+                        for(int j = 0 ; j < tempFileList.length ; j++) {
+                            if (tempFileList[j].getName().equals(tempTarget)) {
+                                int dotIndex = tempTarget.lastIndexOf(".");
+                                String tempName = tempTarget.substring(0, dotIndex);
+                                String tempExtension = tempTarget.substring(dotIndex, tempTarget.length());
+                                tempTarget = tempName + "(1)" + tempExtension;  //original_copied
+                                break;
+                            }
+                        }
+
+                        for(int j = 0 ; j < tempFileList.length ; j++) {
+
+                            if (tempFileList[j].getName().equals(tempTarget)) {
+                                int bracket = tempTarget.lastIndexOf(")");
+                                int bracket_1 = tempTarget.lastIndexOf("(");
+                                int dotIndex = tempTarget.lastIndexOf(".");
+                                String tempName = tempTarget.substring(0, bracket_1);
+                                String tempExtension = tempTarget.substring(dotIndex, tempTarget.length());
+                                int number = tempTarget.charAt(bracket - 1) - '0';
+                                if(((bracket - bracket) == 1) && (number > 0))  {
+
+                                    tempTarget = tempName + "(" + (number+1) + ")" + tempExtension;  //original_copied
+                                }
+                                break;
+                            }
                         }
 
                         copyFile(file, currentPath + File.separator + tempTarget);
@@ -580,10 +629,52 @@ public class FileListFragment extends AppCompatActivity {
         }
     }
 
+    class removeThread implements Runnable {
+
+        int count = clipListView.getCount();
+        long start, end;
+        String tempTarget = null;
+        boolean result;
+
+        public void run(){
+            try {
+
+                
+
+
+
+                // 메시지 얻어오기
+                Message message = handler.obtainMessage();
+                // 메시지 ID 설정
+                message.what = SEND_INFORMATION;
+                // 메시지 내용 설정(int)
+                message.arg1 = (int)(end-start);
+                // 메시지 내용 설정 (Object)
+                String information = new String("소요시간");
+                message.obj = information;
+                // 메시지 전송
+                handler.sendMessage(message);
+
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void startCopyThread() {
         copyThread runnable = new copyThread();
         Thread thread = new Thread(runnable);
         thread.start();
+        thread.interrupt();
+    }
+
+    public void startRemoveThread() {
+        removeThread runnable = new removeThread();
+        Thread thread = new Thread(runnable);
+        thread.start();
+        thread.interrupt();
     }
 
     final Handler handler = new Handler(){
@@ -604,4 +695,27 @@ public class FileListFragment extends AppCompatActivity {
             }
         }
     };
+
+    public int getCheckedItemCount(ListView list) {
+        int count = 0;
+        int getItemCount = list.getCount();
+
+        for(int i = 0 ; i < getItemCount ; i ++){
+            if(list.isItemChecked(i)){
+                count ++;
+            }
+        }
+        return count;
+    }
+
+    public void init(){
+        isLongClick = false;
+        ab.setDisplayShowTitleEnabled(true);
+        ab.setDisplayShowCustomEnabled(false);
+        mMenu.setGroupVisible(R.id.longfalse, true);
+        mMenu.setGroupVisible(R.id.longtrue, false);
+        mMenu.setGroupVisible(R.id.under_two, false);
+        mMenu.setGroupVisible(R.id.over_two, false);
+        getDir(currentPath);
+    }
 }

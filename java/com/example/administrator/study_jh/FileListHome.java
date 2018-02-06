@@ -38,11 +38,6 @@ public class FileListHome extends AppCompatActivity {
 
         setContentView(R.layout.filelisthome);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.home_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_name);
-        getSupportActionBar().setTitle("File Manager");
 
         File file;
 

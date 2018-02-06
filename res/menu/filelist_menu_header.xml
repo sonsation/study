@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
+    <group
+        android:id="@+id/longfalse" >
     <item
         android:id="@+id/file_search"
         android:title="검색"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item android:id="@+id/hide_option"
         android:title="숨겨진 파일 표시"
@@ -28,33 +29,68 @@
         android:title="설정"
         app:showAsAction="never"/>
 
+    </group>
+
+    <group
+        android:id="@+id/longtrue"
+        android:visible="false">
+
     <item
-        android:id="@+id/file_share"
-        android:title="공유"
-        app:showAsAction="never"/>
+        android:id="@+id/file_copy"
+        android:icon="@drawable/action_paste"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_move"
+        android:icon="@drawable/action_move"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/file_remove"
-        android:title="삭제"
-        app:showAsAction="never"/>
+        android:icon="@drawable/action_remove"
+        app:showAsAction="always" />
 
-    <item android:id="@+id/file_move"
-        android:title="이동"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/file_allselect"
+            android:icon="@drawable/action_allselect"
+            app:showAsAction="always" />
 
-    <item android:id="@+id/file_copy"
-        android:title="복사"
-        app:showAsAction="never"/>
+    </group>
 
-    <item android:id="@+id/file_rename"
-        android:title="이름 변경"
-        app:showAsAction="never"/>
+    <group
+        android:id="@+id/over_two"
+        android:visible="false">
 
-    <item android:id="@+id/file_zip"
-        android:title="압축"
-        app:showAsAction="never"/>
+        <item
+            android:id="@+id/file_share"
+            android:title="공유"
+            app:showAsAction="never"/>
 
-    <item android:id="@+id/file_detail"
-        android:title="상세정보"
-        app:showAsAction="never"/>
+        <item android:id="@+id/file_zip"
+            android:title="압축"
+            app:showAsAction="never"/>
+
+    </group>
+
+    <group
+        android:id="@+id/under_two"
+        android:visible="false">
+
+        <item
+            android:id="@+id/file_share"
+            android:title="공유"
+            app:showAsAction="never"/>
+
+        <item android:id="@+id/file_rename"
+            android:title="이름 변경"
+            app:showAsAction="never"/>
+
+        <item android:id="@+id/file_detail"
+            android:title="상세정보"
+            app:showAsAction="never"/>
+
+    </group>
+
+
+
 </menu>
