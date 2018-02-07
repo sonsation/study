@@ -2,56 +2,35 @@ package com.example.administrator.study_jh;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.util.SparseBooleanArray;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
-
-import static java.lang.String.valueOf;
 
 public class FileListFragment extends AppCompatActivity {
 
@@ -71,10 +50,13 @@ public class FileListFragment extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private View drawerView;
     public ListView clipListView = null ;
-    public static final int SEND_INFORMATION = 0;
-    public static final int SEND_STOP = 1;
+    public static final int SEND_STARTINFORMATION = 0;
+    public static final int SEND_INFORMATION = 1;
+    public static final int SEND_STOP = 2;
     public int checked = 0;
-    ActionBar ab;
+    private Handler mHandler;
+    public ProgressDialog mProgressDialog;
+    public ActionBar ab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -283,19 +265,79 @@ public class FileListFragment extends AppCompatActivity {
                             .setMessage("항목 " + getCheckedItemCount(fileListView) + "개를 삭제합니다.")
                             .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    int count = fileListView.getCount();
+                                    mProgressDialog = new ProgressDialog(
+                                            FileListFragment.this);
 
-                                    for (int i = 0; i < count; i++) {
-                                        if (fileListView.isItemChecked(i)) {
-                                            String path = currentPath + File.separator + dirName.get(i).getName().toString();
-                                            remove(path);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+
+                                            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                            mProgressDialog.setMessage("삭제중..");
+                                            mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "취소",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog,
+                                                                            int which) {
+
+                                                            Toast.makeText(getBaseContext(),
+                                                                    "Cancle clicked",
+                                                                    Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
+                                            mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "숨기기",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog,
+                                                                            int which) {
+
+                                                            Toast.makeText(getBaseContext(),
+                                                                    "Hide clicked",
+                                                                    Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
+                                            mProgressDialog.show();// show dialog
+
+                                            if(!mProgressDialog.isShowing()){
+                                                mProgressDialog.show();
+                                            }
                                         }
-                                    }
+                                    });
 
-                                    isLongClick = false;
-                                    getDir(currentPath);
+                                    new Thread( new Runnable() {
+                                        public void run() {
+                                            int count = fileListView.getCount();
+
+                                            try {
+
+                                                mProgressDialog.setMax(getCheckedItemCount(fileListView));
+
+                                                for (int i = 0; i < count; i++) {
+                                                    if (fileListView.isItemChecked(i)) {
+
+                                                        String path = currentPath + File.separator + dirName.get(i).getName().toString();
+                                                        mProgressDialog.setMessage(path);
+                                                        remove(path);
+                                                        mProgressDialog.setProgress(i);
+                                                    }
+                                                }
+
+                                                runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        mProgressDialog.dismiss();
+                                                        Toast.makeText(getApplicationContext(), "작업이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+                                                        init();
+                                                    }
+                                                });
+                                            } catch (Exception  e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }).start();
                                 }
                             })
+
                             .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                 }
@@ -310,11 +352,83 @@ public class FileListFragment extends AppCompatActivity {
                 break;
 
             case R.id.file_rename:
-                Intent intent = new Intent(this, FilecopyPopup.class);
-                DataShare  data = new DataShare("test", checked);
-                intent.putExtra("data", data);
-                startActivity(intent);
+
+                mProgressDialog = new ProgressDialog(
+                        FileListFragment.this);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        mProgressDialog.setMessage("로딩중입니다..");
+                        mProgressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "취소",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+
+                                        Toast.makeText(getBaseContext(),
+                                                "Cancle clicked",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "숨기기",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+
+                                        Toast.makeText(getBaseContext(),
+                                                "Hide clicked",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        mProgressDialog.show();// show dialog
+
+                        if(!mProgressDialog.isShowing()){
+                            mProgressDialog.show();
+                        }
+                    }
+                });
+
+                new Thread( new Runnable() {
+                    public void run() {
+                        int count = fileListView.getCount();
+
+                        try {
+
+                           // for(int i = 0 ; i < 100 ; i++){
+                            //    mProgressDialog.setProgress(i);
+                            //    Thread.sleep(5);
+                           // }
+
+                            mProgressDialog.setMax(getCheckedItemCount(fileListView));
+
+                            for (int i = 0; i < count; i++) {
+                                if (fileListView.isItemChecked(i)) {
+
+                                    String path = currentPath + File.separator + dirName.get(i).getName().toString();
+                                    remove(path);
+                                    mProgressDialog.setProgress(i);
+                                    Thread.sleep(5);
+                                }
+                            }
+
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    //mProgressDialog.dismiss();
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
                 break;
+
 
             case R.id.file_allselect:
                 int count = fileListView.getCount();
@@ -342,6 +456,7 @@ public class FileListFragment extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onBackPressed(){
@@ -629,49 +744,8 @@ public class FileListFragment extends AppCompatActivity {
         }
     }
 
-    class removeThread implements Runnable {
-
-        int count = clipListView.getCount();
-        long start, end;
-        String tempTarget = null;
-        boolean result;
-
-        public void run(){
-            try {
-
-                
-
-
-
-                // 메시지 얻어오기
-                Message message = handler.obtainMessage();
-                // 메시지 ID 설정
-                message.what = SEND_INFORMATION;
-                // 메시지 내용 설정(int)
-                message.arg1 = (int)(end-start);
-                // 메시지 내용 설정 (Object)
-                String information = new String("소요시간");
-                message.obj = information;
-                // 메시지 전송
-                handler.sendMessage(message);
-
-                Thread.sleep(1000);
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void startCopyThread() {
         copyThread runnable = new copyThread();
-        Thread thread = new Thread(runnable);
-        thread.start();
-        thread.interrupt();
-    }
-
-    public void startRemoveThread() {
-        removeThread runnable = new removeThread();
         Thread thread = new Thread(runnable);
         thread.start();
         thread.interrupt();
@@ -681,15 +755,14 @@ public class FileListFragment extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg){
             switch (msg.what) {
+                case SEND_STARTINFORMATION:
+                    break;
                 case SEND_INFORMATION:
                     Toast.makeText(getApplicationContext(), Integer.toString(msg.arg1) + msg.obj, Toast.LENGTH_SHORT).show();
                     getDir(currentPath);
-                    //textView.setText(Integer.toString(msg.arg1) + msg.obj);
                     break;
-               // case SEND_STOP:
-                //    //thread.stopThread();
-                //    //textView.setText("Thread 가 중지됨.");
-                    //break;
+               case SEND_STOP:
+                    break;
                 default:
                     break;
             }
