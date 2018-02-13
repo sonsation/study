@@ -3,7 +3,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:id="@+id/drawer_layout"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:weightSum="1">
 
@@ -72,7 +71,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#00ff0000"
-                android:id="@+id/file_clip" />
+                android:id="@+id/file_clip"
+                android:visibility="gone" />
 
         </LinearLayout>
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.Checkable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,19 +35,24 @@ public class ClipboardListViewAdapter extends BaseAdapter {
     public long getItemId(int position){return position;}
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent){
+    public View getView(final int position, View convertView, ViewGroup parent){
 
         if(convertView==null){
             convertView=inflater.inflate(layout,parent,false);
         }
 
-        ClipboardListViewItem listviewitem=data.get(position);
+        final ClipboardListViewItem listviewitem=data.get(position);
+
+        ImageButton button1 = (ImageButton) convertView.findViewById(R.id.cancle);
+        button1.setOnClickListener(new ImageButton.OnClickListener() {
+            public void onClick(View v) {
+                data.remove(data.get(position));
+                notifyDataSetChanged();
+            }
+        });
 
         TextView name=(TextView)convertView.findViewById(R.id.textView1);
         name.setText(listviewitem.getName());
-
-        TextView flex =(TextView)convertView.findViewById(R.id.textView_flex);
-        flex.setText(listviewitem.getFlex());
 
         return convertView;
     }

@@ -3,27 +3,28 @@
     android:id="@+id/drawer"
     android:layout_gravity="end"
     android:orientation="vertical"
-    android:layout_marginTop="112sp"
-    android:background="#ECDFDF"
+    android:layout_marginTop="56sp"
+    android:background="@android:color/black"
     android:padding="5dp"
     android:weightSum="1"
-    android:layout_height="400sp"
+    android:layout_height="match_parent"
     android:layout_width="240sp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#82966b"
+        android:textColor="@android:color/white"
         android:gravity="center"
         android:textSize="20sp"
         android:text="Clip Board" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="279dp"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="0.29"
+        android:layout_height="360dp">
 
         <ListView
             android:id="@+id/file_clipboard"
@@ -35,11 +36,12 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="23dp"
         android:background="#f2ffe8"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_weight="0.07">
 
         <Button
         android:id="@+id/file_paste"
