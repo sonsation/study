@@ -7,8 +7,8 @@
     android:background="@android:color/black"
     android:padding="5dp"
     android:weightSum="1"
-    android:layout_height="match_parent"
-    android:layout_width="240sp">
+    android:layout_width="240sp"
+    android:layout_height="460dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
         android:layout_margin="10dp"
         android:gravity="center"
         android:orientation="vertical"
-        android:layout_weight="0.29"
+        android:layout_weight="0.56"
         android:layout_height="360dp">
 
         <ListView

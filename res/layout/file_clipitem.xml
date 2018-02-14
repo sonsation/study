@@ -26,7 +26,7 @@
         android:layout_width="325dp"
         android:layout_height="55dp"
         android:id="@+id/textView1"
-        android:textSize="20sp"
+        android:textSize="15dp"
         android:layout_gravity="center"
         android:layout_row="0"
         android:layout_column="1" />

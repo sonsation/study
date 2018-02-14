@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -116,7 +117,14 @@ public class FileListFragment extends AppCompatActivity {
                                 currentPath = nextPath;
                             }
                             else {
-                                Toast.makeText(getApplicationContext(), "Not yet", Toast.LENGTH_SHORT).show();
+                                if (new FilesUtil().getFileExtension(isFile).equals("jpg")) {
+                                    Intent intent = new Intent(getApplication(), ImgView.class);
+                                    intent.putExtra("imgPath", isFile.getPath());
+                                    startActivity(intent);
+                                }
+                                else {
+                                    Toast.makeText(getApplicationContext(), "Not yet", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                     } else {
