@@ -1,15 +1,14 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.listview;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.administrator.study_jh.R;
 
 import java.util.ArrayList;
 

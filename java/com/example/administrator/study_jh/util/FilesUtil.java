@@ -1,30 +1,40 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.util;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.os.Build;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntegerRes;
-import android.support.v4.content.ContextCompat;
+import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
+import android.widget.ImageView;
+
+import com.example.administrator.study_jh.FileListFragment;
+import com.example.administrator.study_jh.R;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by Administrator on 2018-02-13.
  */
 
 public class FilesUtil {
+
+    private static final int THUMBNAIL_SIZE = 256;
 
     public static boolean copyFile(File file, File toDir){
         boolean result;
@@ -91,7 +101,6 @@ public class FilesUtil {
         File[] tempFile = file.listFiles();
 
         if (file.exists()) {
-
             if (file.isDirectory()) {
                 for (int i = 0; i < tempFile.length; i++) {
                     if (tempFile[i].isFile()) {
@@ -219,30 +228,102 @@ public class FilesUtil {
     }
 
     @SuppressLint("NewApi")
-    public static int getFileIcon(File file, Context context){
+    public Drawable getFileIcon(File file, Context context){
 
         if(file.isDirectory()){
-            return R.drawable.folder;
+            return context.getDrawable(R.drawable.folder);
         }
-        else if(file.isFile()){
-            if(getFileExtension(file).equals("apk")) {
+
+        else {
+
+            if (getFileExtension(file).equals("apk")) {
                 String filePath = file.getPath();
                 PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(filePath, PackageManager.GET_ACTIVITIES);
-                if(packageInfo != null) {
+
+                if (packageInfo != null) {
                     ApplicationInfo appinfo = packageInfo.applicationInfo;
-                    if(Build.VERSION.SDK_INT >= 8) {
+
+                    if (Build.VERSION.SDK_INT >= 8) {
                         appinfo.sourceDir = filePath;
                         appinfo.publicSourceDir = filePath;
                     }
-                    Drawable icon1 = appinfo.loadIcon(context.getPackageManager());
-                    //return icon1;
+
+                    Drawable appIcon = appinfo.loadIcon(context.getPackageManager());
+
+                    return appIcon;
                 }
+            } else if (getFileMimeType(file).startsWith("image/")) {
+
+                // 읽어드릴 파일
+                BitmapFactory.Options bounds = new BitmapFactory.Options();
+                bounds.inPreferredConfig = Bitmap.Config.RGB_565;
+                bounds.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(file.getPath(), bounds);
+
+
+                bounds.inSampleSize = calculateInSampleSize(bounds, 50, 50);
+                bounds.inJustDecodeBounds = false;
+
+                Bitmap icon = BitmapFactory.decodeFile(file.getPath(), bounds);
+
+                String tempDir = new ManagementCache().getCacheDIr() + File.separator +".cache_" + file.getName();
+
+                if(!(new File(tempDir).exists())) {
+                    new ManagementCache().saveBitmapToJpeg(icon, tempDir);
+                }
+
+                BitmapDrawable convertDrawble = new BitmapDrawable(context.getResources(), icon);
+
+                return convertDrawble;
+            } else if (getFileMimeType(file).startsWith("audio/")) {
+
+                MediaMetadataRetriever metadataRetriever;
+                metadataRetriever = new MediaMetadataRetriever();
+                metadataRetriever.setDataSource(file.getAbsolutePath());
+                byte[] picture = metadataRetriever.getEmbeddedPicture();
+                if (picture == null) return null;
+                metadataRetriever.release();
+
+                Bitmap icon = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                BitmapDrawable convertDrawble = new BitmapDrawable(context.getResources(), icon);
+
+                return convertDrawble;
+            } else if (getFileMimeType(file).startsWith("video/")) {
+
+                Bitmap icon = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+                BitmapDrawable convertDrawble = new BitmapDrawable(context.getResources(), icon);
+
+                return convertDrawble;
+            } else {
+                return context.getDrawable(R.drawable.file);
             }
-            else {
-                return R.drawable.file;
+
+        }
+
+        return null;
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
             }
         }
-        return 0;
+
+        return inSampleSize;
     }
 
 }

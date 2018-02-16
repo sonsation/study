@@ -1,10 +1,12 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.util;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
+
+import com.example.administrator.study_jh.R;
 
 /**
  * Created by Administrator on 2018-02-14.

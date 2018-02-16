@@ -1,14 +1,14 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.listview;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.administrator.study_jh.R;
 
 import java.util.ArrayList;
 
@@ -36,20 +36,25 @@ public class ListviewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
 
+        SonsationViewHolder viewHolder;
+
         if(convertView==null){
             convertView=inflater.inflate(layout,parent,false);
+
+            viewHolder = new SonsationViewHolder();
+            viewHolder.icon=(ImageView)convertView.findViewById(R.id.imageView1);
+            viewHolder.name=(TextView)convertView.findViewById(R.id.textView1);
+            viewHolder.flex =(TextView)convertView.findViewById(R.id.textView_flex);
+
+            convertView.setTag(viewHolder);
+        }
+        else {
+            viewHolder = (SonsationViewHolder) convertView.getTag();
         }
 
-        ListviewItem listviewitem=data.get(position);
-
-        ImageView icon=(ImageView)convertView.findViewById(R.id.imageView1);
-        icon.setImageResource(listviewitem.getIcon());
-
-        TextView name=(TextView)convertView.findViewById(R.id.textView1);
-        name.setText(listviewitem.getName());
-
-        TextView flex =(TextView)convertView.findViewById(R.id.textView_flex);
-        flex.setText(listviewitem.getFlex());
+        viewHolder.icon.setImageDrawable(data.get(position).getIcon());
+        viewHolder.name.setText(data.get(position).getName());
+        viewHolder.flex.setText(data.get(position).getFlex());
 
         return convertView;
     }

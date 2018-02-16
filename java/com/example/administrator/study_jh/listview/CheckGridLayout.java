@@ -1,4 +1,4 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.listview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,8 @@ import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+
+import com.example.administrator.study_jh.R;
 
 /**
  * Created by Administrator on 2018-01-26.
