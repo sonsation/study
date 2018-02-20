@@ -25,6 +25,8 @@
         <activity android:name=".FileListHome"></activity>
         <activity android:name=".FilecopyPopup" android:theme="@android:style/Theme.Dialog"></activity>
         <activity android:name=".util.ImgView"></activity>
+        <activity android:name=".HomeFragment"></activity>
+        <activity android:name=".util.ControlTab"></activity>
     </application>
 
 </manifest>

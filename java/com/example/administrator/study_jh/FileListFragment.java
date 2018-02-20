@@ -3,8 +3,6 @@ package com.example.administrator.study_jh;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.ProgressDialog;
@@ -12,8 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -50,8 +49,6 @@ public class FileListFragment extends AppCompatActivity {
     private boolean hideOption = true;
     private boolean isLongClick = false;
     private String rootPath = "";
-    private String nextPath = "";
-    private String prevPath = "";
     public String currentPath = "";
     public int checked = 0;
     public int pageStack = 0;
@@ -72,18 +69,25 @@ public class FileListFragment extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_filelist);
+        //setContentView(R.layout.fragment_filelist);
         ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(false);
         ab.setDisplayShowCustomEnabled(false);
         ab.setDisplayShowTitleEnabled(true);
         ab.setTitle("FILE MANAGER");
 
-        clipListView = (ListView) findViewById(R.id.file_clipboard);
-        fileListView = (ListView)(findViewById(R.id.filelistview));
+        clipListView = (ListView)findViewById(R.id.file_clipboard);
+        fileListView = (ListView)findViewById(R.id.filelistview);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerView = (View)findViewById(R.id.drawer);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+
+        final TextView displayPath = (TextView)findViewById(R.id.displaypath);
+
+        //FloatingActionButton mFloatingButton = (FloatingActionButton) findViewById(R.id.fab);
+        //mFloatingButton.setAlw(fileListView);
+
 
         rootPath = getIntent().getStringExtra("path");
 
@@ -92,6 +96,8 @@ public class FileListFragment extends AppCompatActivity {
         } else {
             currentPath = rootPath;
         }
+
+        displayPath.setText(currentPath);
 
         getDir(currentPath);
 
@@ -102,10 +108,10 @@ public class FileListFragment extends AppCompatActivity {
                     if (isLongClick == false) {
 
                         String path = dirName.get(position).getName().toString();
-                        nextPath = currentPath + File.separator + path;
+                        String nextPath = currentPath + File.separator + path;
 
                         int lastPostion = currentPath.lastIndexOf("/");
-                        prevPath = currentPath.substring(0, lastPostion);
+                        String prevPath = currentPath.substring(0, lastPostion);
 
                         if (path.equals("..")) {
 
@@ -140,7 +146,7 @@ public class FileListFragment extends AppCompatActivity {
                             }
                         }
 
-
+                        displayPath.setText(currentPath);
 
                     } else {
                         TextView getitemcount = (TextView)findViewById(R.id.getitemcount);
@@ -456,7 +462,7 @@ public class FileListFragment extends AppCompatActivity {
             pageStack--;
 
             int lastPostion = currentPath.lastIndexOf("/");
-            prevPath = currentPath.substring(0, lastPostion);
+            String prevPath = currentPath.substring(0, lastPostion);
             currentPath = prevPath;
 
             getDir(currentPath);

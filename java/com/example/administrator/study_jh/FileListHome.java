@@ -3,8 +3,10 @@ package com.example.administrator.study_jh;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,27 +28,46 @@ import java.util.List;
  * Created by Administrator on 2018-01-26.
  */
 
-public class FileListHome extends AppCompatActivity {
+public class FileListHome extends Fragment {
 
     private String internal_path = Environment.getExternalStorageDirectory().getAbsolutePath();
     private String external_path = "";
     private String status = Environment.getExternalStorageState();
-    //private String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+    private TextView space_confirm;
+    private TextView external_space_confirm;
+    private ProgressBar progress;
+    private ProgressBar external_progress;
+    private GridLayout layout;
+    private GridLayout external_layout;
+
+    public FileListHome(){
+
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.filelisthome);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.filelisthome, container, false);
 
+        space_confirm = (TextView)view.findViewById(R.id.space_confirm);
+        external_space_confirm = (TextView)view.findViewById(R.id.external_space_confirm);
+        progress = (ProgressBar)view.findViewById(R.id.progress);
+        external_progress = (ProgressBar)view.findViewById(R.id.external_progress);
+        layout = (GridLayout)view.findViewById(R.id.internal);
+        external_layout = (GridLayout)view.findViewById(R.id.external);
+
+        return view;
+    }
+
+    @Override
+    public void onStart(){
         File file;
-
-        final TextView space_confirm = (TextView)findViewById(R.id.space_confirm);
-        final TextView external_space_confirm = (TextView)findViewById(R.id.external_space_confirm);
-        final ProgressBar progress = (ProgressBar)findViewById(R.id.progress);
-        final ProgressBar external_progress = (ProgressBar)findViewById(R.id.external_progress);
-        final GridLayout layout = (GridLayout)findViewById(R.id.internal);
-        final GridLayout external_layout = (GridLayout)findViewById(R.id.external);
 
         if(status.equalsIgnoreCase(Environment.MEDIA_MOUNTED)){
 
@@ -84,7 +105,7 @@ public class FileListHome extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent(getApplicationContext(), FileListFragment.class);
+                Intent intent = new Intent(getActivity(), FileListFragment.class);
                 intent.putExtra("path", internal_path);
                 startActivity(intent);
             }
@@ -95,37 +116,13 @@ public class FileListHome extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent(getApplicationContext(), FileListFragment.class);
+                Intent intent = new Intent(getActivity(), FileListFragment.class);
                 intent.putExtra("path", external_path);
                 startActivity(intent);
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //return super.onCreateOptionsMenu(menu);
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.filelist_menu_header, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        //return super.onOptionsItemSelected(item);
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.layout__rightin, R.anim.layout__rightout);
-                return true;
-
-            default:
-
-        }
-        return super.onOptionsItemSelected(item);
+        super.onStart();
     }
 
     public static String getExternalSdCardPath() {
@@ -161,6 +158,4 @@ public class FileListHome extends AppCompatActivity {
 
         return sdCardFile.getAbsolutePath();
     }
-
-
 }

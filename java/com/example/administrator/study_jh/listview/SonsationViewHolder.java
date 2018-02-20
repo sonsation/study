@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 public class SonsationViewHolder {
     public ImageView icon;
-    public ListView listView;
     public TextView name;
     public TextView flex;
 }

@@ -11,11 +11,6 @@ public class ListviewItem {
     public String getName(){return name;}
     public String getFlex(){return flex;}
 
-    public ListviewItem(Drawable icon)
-    {
-        this.icon=icon;
-    }
-
     public ListviewItem(Drawable icon, String name, String flex){
         this.icon=icon;
         this.name=name;
