@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:text="정렬"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.04" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+
+    <RadioButton
+        android:text="이름"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sortname" />
+
+    <RadioButton
+        android:text="용량"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sortsize" />
+
+    <RadioButton
+        android:text="시간"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sortmodified" />
+
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_centerInParent="true"
+        android:background="#000000"/>
+
+    <TextView
+        android:text="순서"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:layout_weight="0.04" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+    <RadioButton
+        android:text="오름차 순"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/setasc"
+        android:layout_weight="0.04" />
+
+    <RadioButton
+        android:text="내림차 순"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/setdsc"
+        android:layout_weight="0.04" />
+
+    </RadioGroup>
+
+
+</LinearLayout>

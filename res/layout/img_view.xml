@@ -9,4 +9,6 @@
         android:layout_height="wrap_content"
         app:srcCompat="@android:color/white"
         android:id="@+id/img2" />
+
+
 </LinearLayout>

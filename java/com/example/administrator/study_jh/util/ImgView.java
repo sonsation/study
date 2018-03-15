@@ -1,8 +1,10 @@
 package com.example.administrator.study_jh.util;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 
@@ -21,7 +23,10 @@ public class ImgView extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.img_view);
 
-        path = getIntent().getStringExtra("imgPath");
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        path = data.getPath();
+
         ImageView image = (ImageView)findViewById(R.id.img2);
         Bitmap bm = BitmapFactory.decodeFile(path);
         image.setImageBitmap(bm);

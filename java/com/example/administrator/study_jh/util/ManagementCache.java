@@ -18,11 +18,13 @@ import java.io.IOException;
 
 public class ManagementCache {
 
-    private final static String targetDirName = ".cache_sonsation";
+    private final static String cacheDirName = ".cache_fileFactory";
+    private final static String cacheDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + cacheDirName;
+    private final static String cacheExtenstion = ".cache_";
 
     public String getCacheDIr(){
-        String cacheDir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + targetDirName ;
-        File cache = new File(cacheDir.toString());
+
+        File cache = new File(cacheDir);
 
         if(!cache.exists()) {
             cache.mkdirs();
@@ -33,7 +35,7 @@ public class ManagementCache {
 
     public void saveBitmapToJpeg(Bitmap bitmap, String dir){
 
-        File todir = new File(dir);
+        File todir = new File(cacheDir + File.separator + cacheExtenstion + dir);
 
         try{
             if((!todir.exists()) || (!dir.startsWith(getCacheDIr()))) {
@@ -53,17 +55,28 @@ public class ManagementCache {
         }
     }
 
+    public boolean existCache(String cache){
+
+        File fCache = new File(getCacheDIr() + File.separator + cacheExtenstion + cache);
+
+        if(fCache.exists()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public Drawable getCacheFile(Context context, String cacheFileName){
 
-        String cacheDir = getCacheDIr() + File.separator + ".cache_" + cacheFileName;
+        String findCache = cacheDir + File.separator + cacheExtenstion + cacheFileName;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 2;
 
-        Bitmap icon = BitmapFactory.decodeFile(cacheDir, options);
+        Bitmap icon = BitmapFactory.decodeFile(findCache, options);
         BitmapDrawable convertDrawble = new BitmapDrawable(context.getResources(), icon);
 
         return convertDrawble;
     }
-
 }

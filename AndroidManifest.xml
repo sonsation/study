@@ -17,16 +17,54 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FileListFragment"></activity>
-        <activity android:name=".FileListHome"></activity>
-        <activity android:name=".FilecopyPopup" android:theme="@android:style/Theme.Dialog"></activity>
-        <activity android:name=".util.ImgView"></activity>
-        <activity android:name=".HomeFragment"></activity>
-        <activity android:name=".util.ControlTab"></activity>
+
+        <activity
+            android:name=".util.MusicPlayer"
+            android:label="File Factory Media Player"
+            android:theme="@android:style/Theme.Dialog">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*"/>
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name=".util.ImgView"
+            android:label="File Factory Image View">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".util.Settings"
+            android:label="@string/action_settings"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity
+            android:name=".util.FileCopy"
+            android:theme="@android:style/Theme.Dialog"/>
+
+        <activity
+            android:name=".util.IntentUtil"/>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package com.example.administrator.study_jh.util;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -15,18 +14,14 @@ import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
-import android.widget.ImageView;
 
-import com.example.administrator.study_jh.FileListFragment;
 import com.example.administrator.study_jh.R;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Created by Administrator on 2018-02-13.
@@ -35,65 +30,6 @@ import java.io.IOException;
 public class FilesUtil {
 
     private static final int THUMBNAIL_SIZE = 256;
-
-    public static boolean copyFile(File file, File toDir){
-        boolean result;
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-
-        int data = -1;
-
-        if(file.exists()){
-
-            try {
-                fis = new FileInputStream(file);
-                bis = new BufferedInputStream(fis);
-                fos = new FileOutputStream(toDir);
-                bos = new BufferedOutputStream(fos);
-
-                while((data = bis.read())!= -1){
-                    bos.write(data);
-                }
-                bos.flush();
-                bos.close(); fos.close(); bis.close(); fis.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            result = true;
-        }
-        else {
-            result = false;
-        }
-        return result;
-    }
-
-    public static void copyDir(File dir, File toDir){
-
-        if(!toDir.exists()){
-            toDir.mkdirs();
-        }
-
-        File[] fList = dir.listFiles();
-
-        if(fList.length > 0) {
-
-            for (int i = 0; i < fList.length; i++) {
-
-                File oldPath = new File(fList[i].getPath());
-                File newPath = new File(toDir.getPath() + File.separator + fList[i].getName());
-
-                if (fList[i].isDirectory()) {
-                    copyDir(oldPath, newPath);
-                } else if (fList[i].isFile()) {
-                    copyFile(fList[i], newPath);
-                }
-
-            }
-        }
-    }
 
     public static void remove(String path) {
 
@@ -266,15 +202,14 @@ public class FilesUtil {
 
                 Bitmap icon = BitmapFactory.decodeFile(file.getPath(), bounds);
 
-                String tempDir = new ManagementCache().getCacheDIr() + File.separator +".cache_" + file.getName();
-
-                if(!(new File(tempDir).exists())) {
-                    new ManagementCache().saveBitmapToJpeg(icon, tempDir);
+                if(!(new ManagementCache().existCache(file.getName()))) {
+                    new ManagementCache().saveBitmapToJpeg(icon, file.getName());
                 }
 
                 BitmapDrawable convertDrawble = new BitmapDrawable(context.getResources(), icon);
 
                 return convertDrawble;
+
             } else if (getFileMimeType(file).startsWith("audio/")) {
 
                 MediaMetadataRetriever metadataRetriever;
@@ -305,7 +240,7 @@ public class FilesUtil {
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
+
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
@@ -315,8 +250,6 @@ public class FilesUtil {
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
 
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
             while ((halfHeight / inSampleSize) >= reqHeight
                     && (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2;

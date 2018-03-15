@@ -41,7 +41,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_move"
+        android:id="@+id/file_move"
         android:icon="@drawable/action_move"
         app:showAsAction="always" />
 

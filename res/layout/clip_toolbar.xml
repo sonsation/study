@@ -20,6 +20,7 @@
         android:layout_height="match_parent"
         android:id="@+id/getitemcount"
         android:gravity="center"
+        android:textColor="@android:color/white"
         android:layout_weight="0.07"
         android:layout_marginLeft="5dp"
         android:textSize="15sp"/>

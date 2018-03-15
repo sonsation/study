@@ -1,5 +1,6 @@
 package com.example.administrator.study_jh.listview;
 
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 
 /**
@@ -7,14 +8,17 @@ import android.support.v4.app.Fragment;
  */
 
 public class TabItem {
+    private Drawable icon;
     private Fragment fragment;
     private String name;
 
+    public Drawable getIcon(){return icon;}
     public Fragment getFragment(){return fragment;}
     public String getName(){return name;}
 
-    public TabItem(Fragment fName, String name){
-        this.fragment=fName;
+    public TabItem(Drawable icon, Fragment fragment, String name){
+        this.icon=icon;
+        this.fragment=fragment;
         this.name=name;
     }
 }

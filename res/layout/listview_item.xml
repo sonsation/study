@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="60dp">
 
     <ImageView
         android:layout_width="55dp"
@@ -14,35 +14,30 @@
         android:layout_row="0"
         android:layout_column="0"
         android:layout_columnSpan="1"
-        android:layout_rowSpan="3"/>
+        android:layout_rowSpan="3"
+        android:layout_marginLeft="5dp"
+        app:srcCompat="@drawable/photo"/>
 
     <TextView
-        android:layout_width="270dp"
-        android:layout_height="34dp"
-        android:id="@+id/textView1"
-        android:textSize="15sp"
-        android:layout_row="0"
-        android:layout_column="1" />
-
-    <TextView
+        android:layout_marginTop="2dp"
         android:layout_height="20dp"
         android:id="@+id/textView_flex"
         android:textSize="13sp"
         android:layout_row="1"
         android:layout_column="1"
-        android:gravity="right"
-        android:layout_width="270dp" />
+        android:gravity="center|left"
+        android:layout_width="286dp"
+        android:layout_marginLeft="2dp"/>
 
-    <CheckBox
-        android:layout_width="57dp"
-        android:id="@+id/checkBox1"
-        android:visibility="invisible"
+    <TextView
+        android:layout_width="329dp"
+        android:layout_height="34dp"
+        android:gravity="center|left"
+        android:id="@+id/textView1"
+        android:textSize="15sp"
         android:layout_row="0"
-        android:layout_column="3"
-        android:layout_columnSpan="1"
-        android:layout_rowSpan="3"
-        android:layout_height="54dp" />
+        android:layout_column="1"
+        android:textStyle="bold"
+        android:layout_marginLeft="2dp"/>
 
 </GridLayout>
-
-

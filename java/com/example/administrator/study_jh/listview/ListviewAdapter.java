@@ -1,11 +1,14 @@
 package com.example.administrator.study_jh.listview;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.administrator.study_jh.R;
@@ -36,16 +39,14 @@ public class ListviewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
 
-        SonsationViewHolder viewHolder;
+        final SonsationViewHolder viewHolder;
 
         if(convertView==null){
             convertView=inflater.inflate(layout,parent,false);
-
             viewHolder = new SonsationViewHolder();
             viewHolder.icon=(ImageView)convertView.findViewById(R.id.imageView1);
             viewHolder.name=(TextView)convertView.findViewById(R.id.textView1);
             viewHolder.flex =(TextView)convertView.findViewById(R.id.textView_flex);
-
             convertView.setTag(viewHolder);
         }
         else {

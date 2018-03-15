@@ -1,5 +1,6 @@
 package com.example.administrator.study_jh.listview;
 
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;

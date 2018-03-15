@@ -2,14 +2,18 @@ package com.example.administrator.study_jh.listview;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.administrator.study_jh.FileList;
 import com.example.administrator.study_jh.R;
+import com.example.administrator.study_jh.util.ImgView;
 
 import java.util.ArrayList;
 
@@ -39,23 +43,27 @@ public class TabItemAdapter extends BaseAdapter {
 
         if(convertView==null){
             convertView=inflater.inflate(layout,parent,false);
-            convertView.setBackgroundColor(Color.TRANSPARENT);
         }
 
         final TabItem listviewitem=data.get(position);
 
-        /*
-        ImageButton button1 = (ImageButton) convertView.findViewById(R.id.cancle);
-        button1.setOnClickListener(new ImageButton.OnClickListener() {
+        ImageButton fragment_cancle = (ImageButton) convertView.findViewById(R.id.fragment_cancle);
+        fragment_cancle.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v) {
-                data.remove(data.get(position));
-                notifyDataSetChanged();
+                if(position == 0){
+                    return ;
+                } else {
+                    data.remove(data.get(position));
+                    notifyDataSetChanged();
+                }
             }
         });
-        */
 
-        TextView name=(TextView)convertView.findViewById(R.id.textView1);
-        name.setText(listviewitem.getName());
+        ImageView fragment_icon= (ImageView)convertView.findViewById(R.id.fragment_icon);
+        fragment_icon.setImageDrawable(listviewitem.getIcon());
+
+        TextView fragment_name=(TextView)convertView.findViewById(R.id.fragment_textview);
+       fragment_name.setText(listviewitem.getName());
 
         return convertView;
     }

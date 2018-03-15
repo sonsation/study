@@ -15,13 +15,8 @@ import com.example.administrator.study_jh.R;
 
 public class CheckGridLayout extends GridLayout implements Checkable {
 
-    // 만약 CheckBox가 아닌 View를 추가한다면 아래의 변수 사용 가능.
-    // private boolean mIsChecked ;
-
     public CheckGridLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        // mIsChecked = false ;
     }
 
     @Override
@@ -29,7 +24,6 @@ public class CheckGridLayout extends GridLayout implements Checkable {
         CheckBox cb = (CheckBox) findViewById(R.id.checkBox1) ;
 
         return cb.isChecked() ;
-        // return mIsChecked ;
     }
 
     @Override
@@ -37,7 +31,6 @@ public class CheckGridLayout extends GridLayout implements Checkable {
         CheckBox cb = (CheckBox) findViewById(R.id.checkBox1) ;
 
         setChecked(cb.isChecked() ? false : true) ;
-        // setChecked(mIsChecked ? false : true) ;
     }
 
     @Override
@@ -48,7 +41,5 @@ public class CheckGridLayout extends GridLayout implements Checkable {
             cb.setChecked(checked) ;
         }
 
-        // CheckBox 가 아닌 View의 상태 변경.
     }
 }
-

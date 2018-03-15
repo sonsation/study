@@ -1,6 +1,7 @@
 package com.example.administrator.study_jh.listview;
 
 import android.graphics.drawable.Drawable;
+import android.widget.CheckBox;
 
 public class ListviewItem {
     private Drawable icon;

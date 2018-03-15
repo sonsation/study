@@ -7,12 +7,13 @@
     android:background="#DCDBDB"
     android:padding="5dp"
     android:weightSum="1"
-    android:layout_width="240sp"
     android:layout_height="match_parent"
-    android:layout_marginTop="25dp">
+    android:layout_marginTop="25dp"
+    android:layout_width="300dp">
 
     <LinearLayout
         android:id="@+id/layout"
+        android:background="@drawable/border"
         android:layout_width="match_parent"
         android:layout_margin="10dp"
         android:gravity="center"
@@ -26,13 +27,16 @@
             android:id="@+id/tab_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:divider="@null"
             android:layout_weight="0.56" />
-    </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="51dp"
@@ -43,6 +47,6 @@
         android:id="@+id/fab"
         android:layout_weight="0.02"
         app:layout_anchor="@id/layout"
-        app:layout_anchorGravity="top|right|end" />
+        app:layout_anchorGravity="top|right" />
 
 </android.support.design.widget.CoordinatorLayout>

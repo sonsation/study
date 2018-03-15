@@ -4,7 +4,7 @@
     android:layout_gravity="end"
     android:orientation="vertical"
     android:layout_marginTop="56sp"
-    android:background="@android:color/black"
+    android:background="#DCDBDB"
     android:padding="5dp"
     android:weightSum="1"
     android:layout_width="240sp"
@@ -27,6 +27,7 @@
         android:layout_height="360dp">
 
         <ListView
+            android:background="@drawable/border"
             android:id="@+id/file_clipboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,27 +36,28 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="209dp"
         android:layout_height="23dp"
-        android:background="#f2ffe8"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_weight="0.07">
+        android:background="#DCDBDB"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
 
         <Button
         android:id="@+id/file_paste"
-        android:layout_height="wrap_content"
-        android:background="#00ff0000"
+        android:layout_height="match_parent"
+        android:background="#FF689F"
+        android:layout_gravity="left"
         android:textColor="#000000"
         android:text="PASTE"
         android:layout_width="100dp" />
 
         <Button
+            android:layout_marginLeft="10dp"
             android:id="@+id/clip_clear"
-            android:layout_height="wrap_content"
-            android:background="#00ff0000"
+            android:layout_height="match_parent"
+            android:background="#FF689F"
             android:textColor="#000000"
+            android:layout_gravity="right"
             android:text="CLEAR"
             android:layout_width="100dp" />
     </LinearLayout>

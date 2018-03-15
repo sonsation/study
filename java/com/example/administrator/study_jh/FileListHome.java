@@ -104,10 +104,7 @@ public class FileListHome extends Fragment {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Intent intent = new Intent(getActivity(), FileListFragment.class);
-                intent.putExtra("path", internal_path);
-                startActivity(intent);
+
             }
         });
 
@@ -115,10 +112,7 @@ public class FileListHome extends Fragment {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Intent intent = new Intent(getActivity(), FileListFragment.class);
-                intent.putExtra("path", external_path);
-                startActivity(intent);
+
             }
         });
 
