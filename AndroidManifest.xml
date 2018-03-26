@@ -43,17 +43,35 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".util.TextEditor"
+            android:label="File Factory Text Editor">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*"/>
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".util.Settings"
             android:label="@string/action_settings"
             android:parentActivityName=".MainActivity"/>
 
         <activity
+            android:name=".util.ZipUtil"
+            android:theme="@android:style/Theme.Dialog"/>
+
+        <activity
             android:name=".util.FileCopy"
             android:theme="@android:style/Theme.Dialog"/>
 
         <activity
-            android:name=".util.IntentUtil"/>
+            android:name=".util.FileRemove"
+            android:theme="@android:style/Theme.Dialog"/>
+
+        <activity
+            android:name=".util.ZipExtractor" />
+
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -63,7 +81,11 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
-        </provider>
+        </provider><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

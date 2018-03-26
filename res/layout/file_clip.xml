@@ -7,8 +7,8 @@
     android:background="#DCDBDB"
     android:padding="5dp"
     android:weightSum="1"
-    android:layout_width="240sp"
-    android:layout_height="460dp">
+    android:layout_height="500dp"
+    android:layout_width="260dp">
 
     <TextView
         android:layout_width="match_parent"

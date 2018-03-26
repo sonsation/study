@@ -63,7 +63,7 @@ public class TabItemAdapter extends BaseAdapter {
         fragment_icon.setImageDrawable(listviewitem.getIcon());
 
         TextView fragment_name=(TextView)convertView.findViewById(R.id.fragment_textview);
-       fragment_name.setText(listviewitem.getName());
+        fragment_name.setText(listviewitem.getName());
 
         return convertView;
     }

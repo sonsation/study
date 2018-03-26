@@ -15,17 +15,11 @@ import java.util.Objects;
 
 public class ClipboardHandler {
 
-    public enum Action {
-        Copy,
-        Cut,
-    }
-
-    public static HashMap<ClipboardListViewItem, ClipboardListViewItem> clipListItem = new HashMap<>();
-    public static ArrayList<ClipboardListViewItem> listItem = new ArrayList<>();
+    private static ArrayList<ClipboardListViewItem> listItem = new ArrayList<>();
 
     public ClipboardHandler(){}
 
-    public static void setClip(int index, ClipboardListViewItem path){
+    public static void setClip(ClipboardListViewItem path){
         listItem.add(path);
     }
 
@@ -38,7 +32,5 @@ public class ClipboardHandler {
     public static ArrayList<ClipboardListViewItem> getClip(){
         return listItem;
     }
-
-    public static HashMap<Action, ClipboardListViewItem> getHashClip() { return clipListItem; }
 
 }

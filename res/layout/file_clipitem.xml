@@ -8,8 +8,21 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="184dp"
-        android:layout_height="55dp">
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_weight="0.01">
+
+        <ImageView
+            android:layout_height="match_parent"
+            android:id="@+id/clip_img"
+            android:layout_width="46dp" />
+
+        <TextView
+            android:layout_height="match_parent"
+            android:id="@+id/textView1"
+            android:textSize="15dp"
+            android:gravity="center|left"
+            android:layout_width="123dp" />
 
         <ImageButton
             app:srcCompat="@drawable/action_remove"
@@ -18,13 +31,6 @@
             android:layout_gravity="center"
             android:id="@+id/cancle"
             android:background="@android:color/transparent"/>
-
-        <TextView
-            android:layout_width="137dp"
-            android:layout_height="match_parent"
-            android:id="@+id/textView1"
-            android:textSize="15dp"
-            android:gravity="center|left" />
     </LinearLayout>
 
 </LinearLayout>

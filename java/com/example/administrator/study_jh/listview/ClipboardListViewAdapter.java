@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.study_jh.R;
@@ -41,6 +42,9 @@ public class ClipboardListViewAdapter extends BaseAdapter {
         }
 
         final ClipboardListViewItem listviewitem=data.get(position);
+
+        ImageView clip_icon= (ImageView)convertView.findViewById(R.id.clip_img);
+        clip_icon.setImageDrawable(listviewitem.getIcon());
 
         ImageButton button1 = (ImageButton) convertView.findViewById(R.id.cancle);
         button1.setOnClickListener(new ImageButton.OnClickListener() {

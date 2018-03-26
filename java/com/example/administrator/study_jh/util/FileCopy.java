@@ -2,15 +2,6 @@ package com.example.administrator.study_jh.util;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Path;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.AudioManager;
-import android.media.Image;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,8 +16,6 @@ import com.example.administrator.study_jh.FileList;
 import com.example.administrator.study_jh.R;
 import com.example.administrator.study_jh.listview.ClipboardListViewItem;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,7 +36,7 @@ public class FileCopy extends Activity {
     copyAsync copyThread = new copyAsync();
 
     ProgressBar progressBar;
-    Button btnStart;
+    Button btnStop;
     TextView result;
     TextView processing;
     TextView fileName;
@@ -69,10 +58,10 @@ public class FileCopy extends Activity {
         clipList = new ClipboardHandler().getClip();
         clipSize = clipList.size();
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        fileName = (TextView) findViewById(R.id.fileName);
-        processing = (TextView) findViewById(R.id.processing);
-        btnStart = (Button) findViewById(R.id.mExit);
+        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //fileName = (TextView) findViewById(R.id.fileName);
+        //processing = (TextView) findViewById(R.id.processing);
+        btnStop = (Button) findViewById(R.id.mExit);
 
         if(flag){
             Toast.makeText(this,"실행중입니다",Toast.LENGTH_SHORT).show();
@@ -80,7 +69,7 @@ public class FileCopy extends Activity {
             copyThread.execute();
         }
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (copyThread.getStatus() == AsyncTask.Status.RUNNING)
@@ -102,7 +91,8 @@ public class FileCopy extends Activity {
 
     @Override
     public void onBackPressed() {
-
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     public class copyAsync extends AsyncTask<String, Integer, Boolean> {
@@ -129,6 +119,14 @@ public class FileCopy extends Activity {
         @Override
         protected Boolean doInBackground(String... params) {
 
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    int index = file.toString().lastIndexOf("/");
+                    String sourceName = file.toString().substring(index+1);
+                    Log.e("test", sourceName);
+                    fileName.setText(sourceName);
+                }
+            });
 
             if (file.isFile()) {
                 copyFile(file, toFile);
@@ -152,7 +150,8 @@ public class FileCopy extends Activity {
                     new copyAsync().execute();
                 } else {
                     flag = false;
-                    Toast.makeText(getApplication(), "완료.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplication(), "작업이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
                     finish();
                 }
             }
@@ -169,6 +168,7 @@ public class FileCopy extends Activity {
                 }
             });
 
+            setResult(RESULT_CANCELED);
             running = false;
             finish();
             super.onCancelled();
@@ -191,12 +191,9 @@ public class FileCopy extends Activity {
 
             running = true;
             progressBar.setProgress(0);
-            int index = file.toString().lastIndexOf("/");
-            String sourceName = file.toString().substring(index+1);
 
             if (file.exists()) {
 
-                fileName.setText(sourceName);
                 fileSize = file.length();
                 progressBar.setMax((int)fileSize);
 

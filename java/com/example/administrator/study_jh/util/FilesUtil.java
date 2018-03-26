@@ -31,29 +31,6 @@ public class FilesUtil {
 
     private static final int THUMBNAIL_SIZE = 256;
 
-    public static void remove(String path) {
-
-        File file = new File(path);
-        File[] tempFile = file.listFiles();
-
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                for (int i = 0; i < tempFile.length; i++) {
-                    if (tempFile[i].isFile()) {
-                        tempFile[i].delete();
-                    } else {
-                        remove(tempFile[i].getPath());
-                    }
-                    tempFile[i].delete();
-                }
-                file.delete();
-            }
-            else if (file.isFile()) {
-                file.delete();
-            }
-        }
-    }
-
     public static String getFileNmae(String fileName) {
         if(fileName.contains(".")){
             return fileName.substring(0, fileName.lastIndexOf("."));
@@ -257,6 +234,21 @@ public class FilesUtil {
         }
 
         return inSampleSize;
+    }
+
+    public static String calFileSize(long fileSize){
+
+        String size = null;
+        long cal = 1024 * 1024;
+
+        if(fileSize / cal > 1024) {
+            size = String.format("%.2f",(double)fileSize / (double)cal / (double) 1024) + "GB";
+        } else if ((fileSize / cal <= 1024) && (fileSize / cal) >= 1){
+            size = String.format("%.2f",(double)fileSize/(double)cal) + "MB";
+        } else if (fileSize / cal  < 1 ){
+            size = String.format("%.2f", (double)fileSize / (double)1024) + "KB";
+        }
+        return size;
     }
 
 }

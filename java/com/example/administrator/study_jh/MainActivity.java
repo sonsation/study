@@ -2,6 +2,7 @@ package com.example.administrator.study_jh;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -50,14 +52,13 @@ public class MainActivity extends AppCompatActivity {
     public View drawerView;
     public DrawerLayout drawer;
     int fragmentStack = 0;
+    static final int PERMISSION_READ_STATE =123;
     FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        checkPermission();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -75,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                //Toast.makeText(MainActivity.this, " drawer close", Toast.LENGTH_SHORT).show();
-
                 tabAdapter.notifyDataSetChanged();
                 invalidateOptionsMenu();
             }
@@ -97,10 +96,18 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fName = tabMenu.get(position).getFragment();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
 
-                if (fName != null) {
-                    ft.replace(R.id.content_fragment_layout, fName);
-                    ft.addToBackStack(String.valueOf(fragmentStack));
-                    ft.commit();
+
+                if(checkPermission()) {
+                    if (fName != null) {
+                        ft.replace(R.id.content_fragment_layout, fName);
+                        ft.addToBackStack(String.valueOf(fragmentStack));
+                        ft.commit();
+                    }
+                } else {
+
+                        ft.replace(R.id.content_fragment_layout, new RequestPermission());
+                        ft.addToBackStack(String.valueOf(fragmentStack));
+                        ft.commit();
                 }
 
                 drawer.closeDrawer(drawerView);
@@ -126,21 +133,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        if (drawer.isDrawerOpen(drawerView)) {
-            drawer.closeDrawer(drawerView);
-        }
-
-        if (pressedTime == 0) {
-            Toast.makeText(MainActivity.this, " 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
-            pressedTime = System.currentTimeMillis();
+        if(mBackkey != null) {
+            mBackkey.onBack();
         } else {
-            int seconds = (int) (System.currentTimeMillis() - pressedTime);
 
-            if (seconds > 2000) {
+            if (drawer.isDrawerOpen(drawerView)) {
+                drawer.closeDrawer(drawerView);
+            }
+
+            if (pressedTime == 0) {
                 Toast.makeText(MainActivity.this, " 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
-                pressedTime = 0;
+                pressedTime = System.currentTimeMillis();
             } else {
-                super.onBackPressed();
+                int seconds = (int) (System.currentTimeMillis() - pressedTime);
+
+                if (seconds > 2000) {
+                    Toast.makeText(MainActivity.this, " 한 번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+                    pressedTime = 0;
+                } else {
+                    super.onBackPressed();
+                }
             }
         }
     }
@@ -160,28 +172,19 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void checkPermission() {
+    public boolean checkPermission() {
 
-        String[] permission = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        ArrayList<String> notGranntedPermission = new ArrayList<>();
-        final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+        if(permissionCheck == PackageManager.PERMISSION_GRANTED){
+            return true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_READ_STATE);
 
-        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_CONTACTS)) {
-
-            }
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_CONTACTS},
-                        PERMISSIONS_REQUEST_READ_CONTACTS);
-
-
+            return false;
         }
-
-
     }
 
     @Override
@@ -191,16 +194,17 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! do the
-                    // calendar task you need to do.
-
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    Toast.makeText(MainActivity.this, "You dont have required permissions", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
+    }
+
+    private FragmentCallback mBackkey;
+
+    public void setBackkeyListner(FragmentCallback callback){
+        mBackkey = callback;
     }
 
 }
