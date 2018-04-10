@@ -1,4 +1,4 @@
-package com.example.administrator.study_jh;
+package com.example.administrator.study_jh.handler;
 
 import android.support.v4.app.Fragment;
 
@@ -7,5 +7,5 @@ import android.support.v4.app.Fragment;
  */
 
 public interface FragmentCallback {
-    public void onBack();
+    void onBack();
 }

@@ -15,6 +15,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -33,34 +35,26 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.study_jh.asynchronous.asynctasks.FileCopy;
+import com.example.administrator.study_jh.asynchronous.asynctasks.FileRemove;
+import com.example.administrator.study_jh.handler.FragmentCallback;
 import com.example.administrator.study_jh.listview.ClipboardListViewAdapter;
 import com.example.administrator.study_jh.listview.ClipboardListViewItem;
 import com.example.administrator.study_jh.listview.ListviewAdapter;
 import com.example.administrator.study_jh.listview.ListviewItem;
-import com.example.administrator.study_jh.util.ClipboardHandler;
-import com.example.administrator.study_jh.util.FileCopy;
-import com.example.administrator.study_jh.util.FileRemove;
+import com.example.administrator.study_jh.handler.ClipboardHandler;
 import com.example.administrator.study_jh.util.FilesUtil;
 import com.example.administrator.study_jh.util.ManagementCache;
+import com.example.administrator.study_jh.util.UriPathUtil;
 import com.example.administrator.study_jh.util.Settings;
 import com.example.administrator.study_jh.util.ZipExtractor;
-import com.example.administrator.study_jh.util.ZipUtil;
+import com.example.administrator.study_jh.asynchronous.asynctasks.ZipUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -80,7 +74,6 @@ public class FileList extends Fragment implements FragmentCallback {
 
     private boolean hideOption = true;
     private boolean isLongClick = false;
-
     private int checked = 0;
     private int pageStack = 0;
 
@@ -133,7 +126,7 @@ public class FileList extends Fragment implements FragmentCallback {
         ab.setDisplayShowTitleEnabled(true);
         ab.setTitle("FILE MANAGER");
 
-        fileListView = (ListView)view.findViewById(R.id.filelistview);
+        fileListView =  (ListView)view.findViewById(R.id.filelistview);
         clipListView = (ListView)view.findViewById(R.id.file_clipboard);
         getItemCount = (TextView)mCustomView.findViewById(R.id.getitemcount);
         displayPath = (TextView)view.findViewById(R.id.displaypath);
@@ -157,7 +150,6 @@ public class FileList extends Fragment implements FragmentCallback {
 
     @Override
     public void onBack(){
-
         if(pageStack > 0){
             goBack();
         } else {
@@ -199,6 +191,7 @@ public class FileList extends Fragment implements FragmentCallback {
         displayPath.setText(currentPath);
         getDir(currentPath);
 
+
         fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -228,7 +221,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
                             if (new FilesUtil().getFileMimeType(isFile).startsWith("image/")) {
 
-                                Uri temp = FileProvider.getUriForFile(getActivity(), getContext().getPackageName()+ ".fileprovider" , isFile);
+                                Uri temp = new UriPathUtil().getMediaUri(getContext(), isFile.toString());
                                 Intent intent = new Intent(Intent.ACTION_VIEW, temp);
                                 intent.setDataAndType(temp , "image/*");
                                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -244,7 +237,7 @@ public class FileList extends Fragment implements FragmentCallback {
                             }
                             else if (new FilesUtil().getFileMimeType(isFile).startsWith("audio/")) {
 
-                                Uri temp = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName()+ ".fileprovider" , isFile);
+                                Uri temp = new UriPathUtil().getMediaUri(getContext(), isFile.toString());
                                 Intent intent = new Intent(Intent.ACTION_VIEW, temp);
                                 intent.setDataAndType(temp, "audio/*");
                                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -261,7 +254,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
                             else if (new FilesUtil().getFileMimeType(isFile).startsWith("video/")) {
 
-                                Uri temp = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName()+ ".fileprovider" , isFile);
+                                Uri temp = new UriPathUtil().getMediaUri(getContext(), isFile.toString());
                                 Intent intent = new Intent(Intent.ACTION_VIEW, temp);
                                 intent.setDataAndType(temp, "video/*");
                                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -296,12 +289,12 @@ public class FileList extends Fragment implements FragmentCallback {
                             else if (new FilesUtil().getFileMimeType(isFile).startsWith("application/vnd.android.package-archive")) {
 
                                 Intent packageinstaller = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                                packageinstaller.setDataAndType(
-                                        FileProvider.getUriForFile(getActivity(), getContext().getPackageName() + ".fileprovider" , isFile)
+                                Uri temp = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName()+ ".fileprovider" , isFile);
+                                packageinstaller.setDataAndType(temp
                                         , "application/vnd.android.package-archive");
                                 packageinstaller.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                startActivity(Intent.createChooser(packageinstaller, "Open"));
 
+                                startActivity(packageinstaller);
                             }
 
                             else if (new FilesUtil().getFileMimeType(isFile).startsWith("application/pdf")) {
@@ -315,18 +308,6 @@ public class FileList extends Fragment implements FragmentCallback {
                             }
 
                             else if (new FilesUtil().getFileMimeType(isFile).startsWith("application/zip")) {
-
-                                /*
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setDataAndType(
-                                        FileProvider.getUriForFile(getActivity(), getContext().getPackageName() + ".fileprovider" , isFile)
-                                        , "application/zip");
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                startActivity(Intent.createChooser(intent, "Open"));
-                                */
-
-                                //extractZipFiles(isFile);
-
                                 Intent intent = new Intent(getActivity(), ZipExtractor.class);
                                 intent.putExtra("path", isFile.toString());
                                 startActivity(intent);
@@ -340,11 +321,13 @@ public class FileList extends Fragment implements FragmentCallback {
                     displayPath.setText(currentPath);
 
                 } else {
-                    checked = getCheckedItemCount(fileListView);
+                    //checked = getCheckedItemCount(fileListView);
                     getItemCount.setText(String.valueOf(checked));
                 }
             }
         });
+
+
 
         cancle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -358,11 +341,10 @@ public class FileList extends Fragment implements FragmentCallback {
             public void onClick(View view) {
 
                 int getSize = ClipboardHandler.getClip().size();
-                Log.e("size", String.valueOf(getSize));
+
                 for(int i = getSize-1 ; i >= 0 ; i--) {
 
                     File temp = new File(ClipboardHandler.getClip().get(i).getPath());
-                    Log.e("e", temp.toString());
 
                     if(!temp.exists()){
                         ClipboardHandler.removeClip(i);
@@ -441,10 +423,10 @@ public class FileList extends Fragment implements FragmentCallback {
                 isLongClick = true;
                 fileListView.requestFocusFromTouch();
                 getDir(currentPath);
-                fileListView.setSelection(index);
-                fileListView.setItemChecked(index, true);
+                //fileListView.setSelection(index-1);
+                //fileListView.setItemChecked(index-1, true);
 
-                checked = getCheckedItemCount(fileListView);
+                //checked = getCheckedItemCount(fileListView);
                 getItemCount.setText(String.valueOf(checked));
 
                 return true;
@@ -478,9 +460,6 @@ public class FileList extends Fragment implements FragmentCallback {
                 renameFile(currentPath + File.separator + dirName.get(index).getName().toString());
                 return true;
 
-            case 6 : //Detail
-                Toast.makeText(getActivity(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
-                return true;
         }
 
         return super.onContextItemSelected(item);
@@ -530,19 +509,24 @@ public class FileList extends Fragment implements FragmentCallback {
 
             case R.id.file_remove:
 
+                /*
                 if(getCheckedItemCount(fileListView) == 0){
                     Toast.makeText(getActivity(), "파일이나 폴더를 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
 
+
                 else {
+
                     new AlertDialog.Builder(getActivity())
                             .setMessage("항목 " + getCheckedItemCount(fileListView) + "개를 삭제합니다.")
                             .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    /*
                                     Intent intent = new Intent(getActivity(), FileRemove.class);
                                     intent.putExtra("path", getCheckedItem());
                                     init();
                                     startActivityForResult(intent,PICK_REMOVE_REQUEST);
+
                                 }
                             })
 
@@ -551,8 +535,9 @@ public class FileList extends Fragment implements FragmentCallback {
                                 }
                             })
                             .show();
-                }
 
+                }
+*/
                 break;
 
             case R.id.file_copy:
@@ -573,6 +558,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
             case R.id.file_allselect:
 
+                /*
                 int count = fileListView.getCount();
 
                 if(count == getCheckedItemCount(fileListView)){
@@ -586,6 +572,7 @@ public class FileList extends Fragment implements FragmentCallback {
                 }
                 checked = getCheckedItemCount(fileListView);
                 getItemCount.setText(String.valueOf(checked));
+                */
                 break;
 
             case R.id.file_sorting:
@@ -594,7 +581,6 @@ public class FileList extends Fragment implements FragmentCallback {
 
             case R.id.file_zip:
                 compressionSetting();
-
 
                 break;
             default:
@@ -745,12 +731,15 @@ public class FileList extends Fragment implements FragmentCallback {
     }
 
     public void copyToClipboard(String action){
+        /*
         ArrayList<String> getCheckedItem = getCheckedItem();
+
 
         if(getCheckedItemCount(fileListView) == 0) {
             Toast.makeText(getActivity(), "선택된 폴더나 파일이 없습니다.", Toast.LENGTH_SHORT).show();
             return;
         }
+        */
 
         if(action.equals("COPY")) {
             for(int i = 0 ; i < ClipboardHandler.getClip().size() ; i++){
@@ -767,6 +756,7 @@ public class FileList extends Fragment implements FragmentCallback {
             ClipboardHandler.setclear();
         }
 
+        /*
         for(int i = 0 ; i < getCheckedItem.size() ; i++) {
             for(int j = 0 ; j < ClipboardHandler.getClip().size() ; j++){
                 if(getCheckedItem.get(i).equals(ClipboardHandler.getClip().get(j).getPath())){
@@ -786,6 +776,7 @@ public class FileList extends Fragment implements FragmentCallback {
             ClipboardHandler.setClip(new ClipboardListViewItem(null, action, getCheckedItem.get(i), getCheckedItemName));
 
         }
+        */
 
         file_clip.setVisibility(View.VISIBLE);
         clipListView.setAdapter(clipAdapter);
@@ -957,17 +948,19 @@ public class FileList extends Fragment implements FragmentCallback {
         });
     }
 
-    public int getCheckedItemCount(ListView list) {
+    /*
+    public int getCheckedItemCount(RecyclerView list) {
         int count = 0;
-        int getItemCount = list.getCount();
+        //int getItemCount = list.getCount();
 
         for(int i = 0 ; i < getItemCount ; i ++){
-            if(list.isItemChecked(i)){
+            //if(list.isItemChecked(i)){
                 count ++;
             }
         }
         return count;
     }
+    */
 
     public void init(){
         isLongClick = false;
@@ -981,6 +974,7 @@ public class FileList extends Fragment implements FragmentCallback {
         getDir(currentPath);
     }
 
+    /*
     public ArrayList<String> getCheckedItem() {
 
         int count = fileListView.getCount();
@@ -995,6 +989,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
         return checkedItemPath;
     }
+    */
 
     Comparator<ListviewItem> cmpAsc = new Comparator<ListviewItem>() {
         @Override
@@ -1079,7 +1074,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
             } else if (resultCode == RESULT_CANCELED) {
                 getDir(currentPath);
-                Toast.makeText(getActivity(), "작업이 취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "작업이 취소 되었습니다.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1115,9 +1110,10 @@ public class FileList extends Fragment implements FragmentCallback {
             public void onClick(DialogInterface dialog, int which) {
 
                 Intent intent = new Intent(getActivity(), ZipUtil.class);
-                intent.putExtra("zipList", getCheckedItem());
+                //intent.putExtra("zipList", getCheckedItem());
                 intent.putExtra("currentPath", currentPath + File.separator + zipName.getText());
                 intent.putExtra("compressionLevel", 9);
+                init();
                 startActivityForResult(intent, PICK_ZIP_REQUEST);
 
             }
@@ -1135,58 +1131,7 @@ public class FileList extends Fragment implements FragmentCallback {
 
     }
 
-    public static boolean extractZipFiles(File zip_file) {
-        boolean result = false;
-
-        byte[] data = new byte[4096];
-        ZipEntry entry = null;
-        ZipInputStream zipstream = null;
-        FileOutputStream out = null;
-
-        try {
-            zipstream = new ZipInputStream(new FileInputStream(zip_file));
-
-            /*
-            while ((entry = zipstream.getNextEntry()) != null) {
-
-                int read = 0;
-                File entryFile;
-
-
-                out = new FileOutputStream(entryFile);
-                while ((read = zipstream.read(data, 0, 2048)) != -1)
-                    out.write(data, 0, read);
-
-                zipstream.closeEntry();
-
-            }
-            */
-
-            result = true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            result = false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            result = false;
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (zipstream != null) {
-                try {
-                    zipstream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
-    }
+    public String getCurrentPath(){ return currentPath; }
 
 
 

@@ -29,8 +29,6 @@ import java.io.FileOutputStream;
 
 public class FilesUtil {
 
-    private static final int THUMBNAIL_SIZE = 256;
-
     public static String getFileNmae(String fileName) {
         if(fileName.contains(".")){
             return fileName.substring(0, fileName.lastIndexOf("."));
@@ -38,6 +36,24 @@ public class FilesUtil {
         else {
             return "";
         }
+    }
+
+    public static int countFilesIn(File root)
+    {
+        if (root.isDirectory() == false) return 1;
+        File[] files = root.listFiles();
+        if (files == null) return 0;
+
+        int n = 0;
+
+        for (File file : files)
+        {
+            if (file.isDirectory())
+                n += countFilesIn(file);
+            else
+                n ++;
+        }
+        return n;
     }
 
     public static String getFileExtension(File file)
@@ -113,24 +129,6 @@ public class FilesUtil {
 
         }
         return fileName;
-    }
-
-    public static int countFilesIn(File root)
-    {
-        if (root.isDirectory() == false) return 1;
-        File[] files = root.listFiles();
-        if (files == null) return 0;
-
-        int n = 0;
-
-        for (File file : files)
-        {
-            if (file.isDirectory())
-                n += countFilesIn(file);
-            else
-                n ++;
-        }
-        return n;
     }
 
     public static String getFileMimeType(File file)

@@ -3,7 +3,8 @@
     package="com.example.administrator.study_jh">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
@@ -29,49 +30,46 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="audio/*"/>
+                <data android:mimeType="audio/*" />
             </intent-filter>
-
         </activity>
-
-        <activity android:name=".util.ImgView"
+        <activity
+            android:name=".util.ImgView"
             android:label="File Factory Image View">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*"/>
+                <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".util.TextEditor"
+        <activity
+            android:name=".util.TextEditor"
             android:label="File Factory Text Editor">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/*"/>
+
+                <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".util.ZipExtractor" />
         <activity
             android:name=".util.Settings"
             android:label="@string/action_settings"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".asynchronous.asynctasks.ZipUtil"
+            android:theme="@android:style/Theme.Material.Dialog" />
 
         <activity
-            android:name=".util.ZipUtil"
-            android:theme="@android:style/Theme.Dialog"/>
+            android:name=".asynchronous.asynctasks.FileCopy"
+            android:theme="@android:style/Theme.Material.Dialog" />
 
         <activity
-            android:name=".util.FileCopy"
-            android:theme="@android:style/Theme.Dialog"/>
-
-        <activity
-            android:name=".util.FileRemove"
-            android:theme="@android:style/Theme.Dialog"/>
-
-        <activity
-            android:name=".util.ZipExtractor" />
-
+            android:name=".asynchronous.asynctasks.FileRemove"
+            android:theme="@android:style/Theme.Material.Dialog" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -81,11 +79,22 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
-        </provider><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+        </provider>
+
+        <service
+            android:name=".asynchronous.services.ZipService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name=".asynchronous.services.CopyService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name=".asynchronous.services.RemoveService"
+            android:enabled="true"
+            android:exported="true" />
 
     </application>
 

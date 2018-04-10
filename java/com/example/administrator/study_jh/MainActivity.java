@@ -1,47 +1,29 @@
 package com.example.administrator.study_jh;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.support.design.widget.FloatingActionButton;
 
+import com.example.administrator.study_jh.handler.FragmentCallback;
 import com.example.administrator.study_jh.listview.TabItem;
 import com.example.administrator.study_jh.listview.TabItemAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     int fragmentStack = 0;
     static final int PERMISSION_READ_STATE =123;
     FragmentManager fragmentManager = getSupportFragmentManager();
+    ArrayList<Fragment> fragmentHandle = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

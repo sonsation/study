@@ -2,17 +2,14 @@ package com.example.administrator.study_jh.util;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,8 +21,9 @@ import android.widget.TextView;
 
 import com.example.administrator.study_jh.R;
 
-import java.io.File;
 import java.io.IOException;
+
+import static com.example.administrator.study_jh.util.UriPathUtil.getRealPath;
 
 /**
  * Created by Administrator on 2018-02-22.
@@ -55,7 +53,9 @@ public class MusicPlayer extends Activity {
 
         Intent intent = getIntent();
         Uri data = intent.getData();
-        musicPath = data.getPath();
+        Log.e("test", data.getPath());
+        musicPath = getRealPath(getApplicationContext(),data);
+
 
         MediaMetadataRetriever metadataRetriever;
         metadataRetriever = new MediaMetadataRetriever();
@@ -64,11 +64,12 @@ public class MusicPlayer extends Activity {
         byte[] picture = metadataRetriever.getEmbeddedPicture();
         metadataRetriever.release();
 
-        Bitmap icon = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-        BitmapDrawable convertDrawble = new BitmapDrawable(getResources(), icon);
-
-        mAlbum.setImageDrawable(convertDrawble);
-        mName.setText(albumName);
+        if(picture != null) {
+            Bitmap icon = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            BitmapDrawable convertDrawble = new BitmapDrawable(getResources(), icon);
+            mAlbum.setImageDrawable(convertDrawble);
+            mName.setText(albumName);
+        }
 
         if(musicPath != null) {
 

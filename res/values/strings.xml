@@ -8,4 +8,7 @@
     <string name="use_fingerprint_to_authenticate_key" >use_fingerprint_to_authenticate_key</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="service_started">Example Service started</string>
+    <string name="service_label">Example Service Label</string>
 </resources>

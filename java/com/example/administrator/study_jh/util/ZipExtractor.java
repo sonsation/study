@@ -19,13 +19,18 @@ import com.example.administrator.study_jh.R;
 import com.example.administrator.study_jh.listview.ListviewAdapter;
 import com.example.administrator.study_jh.listview.ListviewItem;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -35,6 +40,7 @@ import java.util.zip.ZipInputStream;
 public class ZipExtractor extends AppCompatActivity {
 
     private ArrayList<String> dirName = new ArrayList<>();
+    HashMap<String, ArrayList<String>> headerDetails = new HashMap<>() ;
     private ArrayAdapter adapter;
     private ListView listView;
     private String filePath;
@@ -51,102 +57,107 @@ public class ZipExtractor extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.zip_listview);
 
-        extractZipFiles(filePath);
+        //getZipFiles(filePath);
+        printFileList(filePath);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String path = dirName.get(position).toString();
-                extractZipFiles(path);
+                getZipFiles(path);
 
             }
         });
 
     }
 
-    public void getDir(){
+    public void printFileList(String filePath){
 
-    }
+        FileInputStream fis = null;
+        ZipInputStream zipIs = null;
+        ZipEntry zEntry = null;
 
-    public  boolean extractZipFiles(String zip_file ) {
-        boolean result = false;
-
-        byte[] data = new byte[4096];
-        ZipEntry entry = null;
-        ZipInputStream zipstream = null;
-        FileOutputStream out = null;
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dirName);
 
         try {
-            zipstream = new ZipInputStream(new FileInputStream(zip_file));
+            fis = new FileInputStream(filePath);
+            zipIs = new ZipInputStream(new BufferedInputStream(fis));
+            while((zEntry = zipIs.getNextEntry()) != null){
+
+                if(zEntry.isDirectory()) {
+
+                    Log.e("test", zEntry.getName() + "is Dir");
+
+                    if(zEntry.getName().contains("/")) {
+
+                        String temp = zEntry.getName();
+
+                        while(temp.contains("/")) {
+                            temp = new File(temp).getParent();
+                            Log.e("test", temp);
+                        }
+                    }
+
+                }
+
+                dirName.add(zEntry.getName());
+            }
+            zipIs.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        listView.setAdapter(adapter);
+    }
+
+    public  void getZipFiles(String zip_file) {
+
+        try {
+
+            ZipFile zipFile = new ZipFile(zip_file);
+            Enumeration zipEntries = zipFile.entries();
+
+            String fName;
 
             adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dirName);
 
-            while ((entry = zipstream.getNextEntry()) != null) {
 
-                //File entryFile;
+            while (zipEntries.hasMoreElements()) {
 
-                dirName.add(entry.getName());
+                fName = ((ZipEntry)zipEntries.nextElement()).getName();
+                ZipEntry zipentry = ((ZipEntry)zipEntries.nextElement());
 
-                if(entry.isDirectory()){
-                    Log.e("test", entry + "디렉터리");
+                if(zipentry.isDirectory()) {
+                    Log.e("test", fName.toString() + "is Dir");
                 } else {
-                    Log.e("test", entry + "파일");
+                    Log.e("test", fName.toString() + "is File");
                 }
 
-                int read = 0;
 
-                /*
-
-                if (entry.isDirectory()) {
-                    File folder = new File(directory + entry.getName());
-                    if (!folder.exists()) {
-                        folder.mkdirs();
-                    }
-                    continue;
+                if(!fName.contains("/")) {
+                    dirName.add(fName);
                 } else {
-                    entryFile = new File(directory + entry.getName());
+                    int index = fName.indexOf("/");
+                    dirName.add(fName.substring(0, index));
                 }
 
-                if (!entryFile.exists()) {
-                    boolean isFileMake = entryFile.createNewFile();
-                }
-
-                out = new FileOutputStream(entryFile);
-                while ((read = zipstream.read(data, 0, 2048)) != -1)
-                    out.write(data, 0, read);
-                */
-                //zipstream.closeEntry();
             }
+
+
 
 
             listView.setAdapter(adapter);
 
-            result = true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            result = false;
         } catch (IOException e) {
             e.printStackTrace();
-            result = false;
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (zipstream != null) {
-                try {
-                    zipstream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return result;
     }
 
 }

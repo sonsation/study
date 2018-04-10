@@ -2,34 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="350dp"
-    android:layout_height="220dp"
+    android:layout_height="150dp"
     android:background="#eeeeee"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/total_percent"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="0.52"
-            android:gravity="left"
-            android:textColor="@color/black" />
-
-        <ProgressBar
-            android:id="@+id/total_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="300dp"
-            android:layout_height="20dp" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +15,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/partial_percent"
+            android:id="@+id/percent"
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:layout_marginTop="10dp"
@@ -49,7 +24,7 @@
             android:textColor="@color/black" />
 
         <ProgressBar
-            android:id="@+id/partial_progress"
+            android:id="@+id/progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="300dp"
             android:layout_height="wrap_content" />
@@ -89,10 +64,10 @@
             android:id="@+id/toBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#00000000"
             android:layout_weight="1"
-            android:textSize="15sp"
-            android:text="백그라운드 실행" />
+            android:background="#00000000"
+            android:text="백그라운드 실행"
+            android:textSize="15sp" />
     </LinearLayout>
 
 </LinearLayout>
