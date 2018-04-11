@@ -42,13 +42,10 @@
 
         </LinearLayout>
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/filelistview"
-            android:clickable="false"
-            android:focusable="false"
-            android:choiceMode="multipleChoice" />
+            android:id="@+id/filelistview" />
 
     </LinearLayout>
 

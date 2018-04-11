@@ -99,8 +99,8 @@ public class MusicPlayer extends Activity {
                     mp.pause();
                 } else {
                     mp.start();
-                    getPosition _thread = new getPosition();
-                    _thread.start();
+                    thread = new getPosition();
+                    thread.start();
                 }
             }
         });

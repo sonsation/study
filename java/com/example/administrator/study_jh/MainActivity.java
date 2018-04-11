@@ -20,6 +20,7 @@ import android.widget.Toast;
 import android.support.design.widget.FloatingActionButton;
 
 import com.example.administrator.study_jh.handler.FragmentCallback;
+import com.example.administrator.study_jh.handler.TabMenuHandler;
 import com.example.administrator.study_jh.listview.TabItem;
 import com.example.administrator.study_jh.listview.TabItemAdapter;
 
@@ -29,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
 
     private long pressedTime = 0;
     public ListView tabMenuListView;
-    private ArrayList<TabItem> tabMenu = new ArrayList<>();
     public TabItemAdapter tabAdapter;
     public View drawerView;
     public DrawerLayout drawer;
     int fragmentStack = 0;
     static final int PERMISSION_READ_STATE =123;
     FragmentManager fragmentManager = getSupportFragmentManager();
-    ArrayList<Fragment> fragmentHandle = new ArrayList<>();
+
+    static int fragment_postion = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,16 +60,18 @@ public class MainActivity extends AppCompatActivity {
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
+                //for(int i = 0 ; i < tabMenu.size(); i++){
+                    //tabMenu.get(i).setName(tabMenu.get(i).getFragment());
+                //}
                 tabAdapter.notifyDataSetChanged();
-                invalidateOptionsMenu();
             }
         };
 
         drawer.setDrawerListener(mDrawerToggle);
 
-        tabAdapter = new TabItemAdapter(this, R.layout.tab_listitem, tabMenu);
+        tabAdapter = new TabItemAdapter(this, R.layout.tab_listitem, TabMenuHandler.getTab());
         tabMenuListView = (ListView)findViewById(R.id.tab_listview);
-        tabMenu.add(new TabItem(getResources().getDrawable(R.drawable.home), new FileListHome(), "HOME"));
+        TabMenuHandler.set(new TabItem(getResources().getDrawable(R.drawable.home), new FileListHome(), "HOME"));
 
         tabMenuListView.setAdapter(tabAdapter);
 
@@ -76,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Fragment fName = tabMenu.get(position).getFragment();
+                fragment_postion = position;
+                Fragment fName = TabMenuHandler.getTab().get(position).getFragment();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
-
 
                 if(checkPermission()) {
                     if (fName != null) {
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(fragmentStack < 5) {
                     fragmentStack++;
-                    tabMenu.add(new TabItem(getResources().getDrawable(R.drawable.folder), new FileList(), "Main Storage"));
+                    TabMenuHandler.set(new TabItem(getResources().getDrawable(R.drawable.folder), new FileList(), "Main Storage"));
                     tabAdapter.notifyDataSetChanged();
                 }
             }
@@ -189,5 +192,7 @@ public class MainActivity extends AppCompatActivity {
     public void setBackkeyListner(FragmentCallback callback){
         mBackkey = callback;
     }
+
+    public static int getFragmentPostion(){ return fragment_postion;}
 
 }
